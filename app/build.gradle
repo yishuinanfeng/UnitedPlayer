@@ -14,6 +14,14 @@ android {
             cmake {
                 cppFlags "-std=c++11"
             }
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+        }
+        sourceSets {
+            main{
+                jniLibs.srcDirs=['src/main/cpp/libs']
+            }
         }
     }
     buildTypes {
