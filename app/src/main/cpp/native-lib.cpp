@@ -1,10 +1,20 @@
 #include <jni.h>
 #include <string>
+#include "IDemux.h"
+#include "FFDemux.h"
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_man_manchesterunitedplayer_MainActivity_stringFromJNI(
         JNIEnv* env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
+
+    IDemux *iDemux = new FFDemux();
+    iDemux->Open("/sdcard/v1080.mp4");
+
+    for(;;){
+        XData d = iDemux->Read();
+    }
+
     return env->NewStringUTF(hello.c_str());
 }
