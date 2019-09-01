@@ -49,6 +49,9 @@ XData FFDemux::Read() {
         return XData();
     }
     LOGI("packet size:%d pts:%lld",pkt->size,pkt->pts);
+
+    data.data = reinterpret_cast<unsigned char *>(pkt);
+    data.size = pkt->size;
     return data;
 }
 

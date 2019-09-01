@@ -6,9 +6,10 @@
 #define MANCHESTERUNITEDPLAYER_IDEMUX_H
 
 #include "XData.h"
+#include "XThread.h"
 
 //解封装接口类
-class IDemux {
+class IDemux :public XThread{
 
 public://？
     //打开文件或者流媒体 rmtp rtsp http
@@ -18,6 +19,9 @@ public://？
     virtual XData Read() = 0;
     //总时长（毫秒）
     int totalMs = 0;
+
+protected:
+    virtual void Main();
 };
 
 
