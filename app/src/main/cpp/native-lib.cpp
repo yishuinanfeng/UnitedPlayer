@@ -14,6 +14,8 @@ Java_com_man_manchesterunitedplayer_MainActivity_stringFromJNI(
     iDemux->Open("/sdcard/v1080.mp4");
 
     iDemux->Start();
+    Sleep(3000);
+    iDemux->Stop();
 
     return env->NewStringUTF(hello.c_str());
 }
