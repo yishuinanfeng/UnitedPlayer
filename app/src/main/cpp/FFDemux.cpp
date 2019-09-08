@@ -12,43 +12,59 @@ extern "C" {
 bool FFDemux::Open(const char *url) {
     LOGI("open file %s", url);
     int re = avformat_open_input(&ic, url, 0, 0);
-    if (re != 0){
+    if (re != 0) {
         char buf[1024] = {0};
-        av_strerror(re,buf, sizeof(buf));
-        LOGE("FFDemux open %s failed!",url);
+        av_strerror(re, buf, sizeof(buf));
+        LOGE("FFDemux open %s failed!", url);
         return false;
     }
-    LOGI("FFDemux open %s success!",url);
-
-    re = avformat_find_stream_info(ic,0);
-    if (re != 0){
+    LOGI("FFDemux open %s success!", url);
+    //得到流的上下文
+    re = avformat_find_stream_info(ic, 0);
+    if (re != 0) {
         char buf[1024] = {0};
-        av_strerror(re,buf, sizeof(buf));
-        LOGE("avformat_find_stream_info %s failed!",url);
+        av_strerror(re, buf, sizeof(buf));
+        LOGE("avformat_find_stream_info %s failed!", url);
         return false;
     }
-    LOGI("avformat_find_stream_info %s success!",url);
+    LOGI("avformat_find_stream_info %s success!", url);
 
-    this->totalMs = ic->duration/(AV_TIME_BASE/1000);
-    LOGI("avformat_find_stream_info  totalMs:%d",totalMs);
-
+    this->totalMs = ic->duration / (AV_TIME_BASE / 1000);
+    LOGI("avformat_find_stream_info  totalMs:%d", totalMs);
 
     return true;
 }
 
+XParameter FFDemux::GetParameter() {
+    if (!ic) {
+        LOGE("GetParameter failed!ic is null");
+        return XParameter();
+    }
+
+    int re = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0);
+    if (re < 0) {
+        LOGE("av_find_best_stream failed!");
+        return XParameter();
+    }
+    XParameter xParameter;
+    xParameter.parameters = ic->streams[re]->codecpar;
+    return xParameter;
+}
+
+
 //读取一帧数据（注意防止内存泄漏）
 XData FFDemux::Read() {
     XData data;
-    if (!ic){
+    if (!ic) {
         return XData();
     }
     AVPacket *pkt = av_packet_alloc();
-    int re = av_read_frame(ic,pkt);
-    if (re != 0){
+    int re = av_read_frame(ic, pkt);
+    if (re != 0) {
         av_packet_free(&pkt);
         return XData();
     }
-    LOGI("packet size:%d pts:%lld",pkt->size,pkt->pts);
+    LOGI("packet size:%d pts:%lld", pkt->size, pkt->pts);
 
     data.data = reinterpret_cast<unsigned char *>(pkt);
     data.size = pkt->size;
