@@ -16,7 +16,10 @@ public:
     //打开文件或者流媒体 rmtp rtsp http
     virtual bool Open(const char *url);
     //获取视频参数
-    virtual XParameter GetParameter();
+    virtual XParameter GetVideoParameter();
+
+    //获取音频参数
+    virtual XParameter GetAudioParameter();
 
     //读取一帧数据（注意防止内存泄漏）
     virtual XData Read();
@@ -24,8 +27,9 @@ public:
     FFDemux();
 
 private:
-
     AVFormatContext *ic = 0;
+    int audioStreamIndex = 1;
+    int videoStreamIndex = 0;
 };
 
 

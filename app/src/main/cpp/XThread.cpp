@@ -7,7 +7,10 @@
 #include <thread>
 
 using namespace std;
-
+/**
+ * 延时，本质为释放cpu资源，让cpu休息
+ * @param mis
+ */
 void Sleep(int mis) {
     chrono::microseconds du(mis);
     this_thread::sleep_for(du);

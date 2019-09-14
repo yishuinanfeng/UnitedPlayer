@@ -10,6 +10,7 @@ struct AVCodecParameters;
 
 class XParameter {
 public:
+    //描述一个编码流的属性信息
     AVCodecParameters *parameters = 0;
 };
 
