@@ -5,9 +5,11 @@
 #include "XLog.h"
 #include "IDecode.h"
 #include "FFDecode.h"
+#include "XEGL.h"
+#include <android/native_window_jni.h>
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_man_manchesterunitedplayer_MainActivity_stringFromJNI(
+Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
@@ -28,9 +30,12 @@ Java_com_man_manchesterunitedplayer_MainActivity_stringFromJNI(
     audioDecode->Start();
     videoDecode->Start();
 
-
-//    Sleep(3000);
-//    iDemux->Stop();
-
     return env->NewStringUTF(hello.c_str());
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobject thiz,
+                                                              jobject surface) {
+    ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
+    XEGL::Get()->Init(win);
 }

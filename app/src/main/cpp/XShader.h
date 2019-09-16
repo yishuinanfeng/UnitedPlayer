@@ -1,0 +1,14 @@
+//
+// Created by yanxi on 2019/9/15.
+//
+
+#ifndef MANCHESTERUNITEDPLAYER_XSHADER_H
+#define MANCHESTERUNITEDPLAYER_XSHADER_H
+
+
+class XShader {
+
+};
+
+
+#endif //MANCHESTERUNITEDPLAYER_XSHADER_H

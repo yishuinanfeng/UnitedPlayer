@@ -1,0 +1,14 @@
+//
+// Created by yanxi on 2019/9/15.
+//
+
+#ifndef MANCHESTERUNITEDPLAYER_IVIDEOVIEW_H
+#define MANCHESTERUNITEDPLAYER_IVIDEOVIEW_H
+
+
+class IVideoView {
+
+};
+
+
+#endif //MANCHESTERUNITEDPLAYER_IVIDEOVIEW_H

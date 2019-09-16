@@ -1,0 +1,14 @@
+//
+// Created by yanxi on 2019/9/15.
+//
+
+#ifndef MANCHESTERUNITEDPLAYER_XTEXTURE_H
+#define MANCHESTERUNITEDPLAYER_XTEXTURE_H
+
+
+class XTexture {
+
+};
+
+
+#endif //MANCHESTERUNITEDPLAYER_XTEXTURE_H

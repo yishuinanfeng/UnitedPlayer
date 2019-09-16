@@ -10,6 +10,9 @@
 #include "IObserver.h"
 #include <list>
 
+/**
+ * 负责解码的模块，具体的解码逻辑在子类
+ */
 class IDecode: public IObserver {
 public:
     //打开解码器
