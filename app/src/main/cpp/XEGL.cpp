@@ -83,7 +83,10 @@ public:
     }
 };
 
-
+/**
+ * 单例创建对象
+ * @return
+ */
 XEGL *XEGL::Get() {
     static CXEGL cxegl;
     return &cxegl;

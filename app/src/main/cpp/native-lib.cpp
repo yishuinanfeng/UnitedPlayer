@@ -6,6 +6,7 @@
 #include "IDecode.h"
 #include "FFDecode.h"
 #include "XEGL.h"
+#include "XShader.h"
 #include <android/native_window_jni.h>
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -38,4 +39,6 @@ Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobje
                                                               jobject surface) {
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
     XEGL::Get()->Init(win);
+    XShader shader;
+    shader.Init();
 }

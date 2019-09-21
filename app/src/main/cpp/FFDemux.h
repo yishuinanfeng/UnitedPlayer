@@ -27,6 +27,7 @@ public:
     FFDemux();
 
 private:
+    //整个音视频文件的信息
     AVFormatContext *ic = 0;
     int audioStreamIndex = 1;
     int videoStreamIndex = 0;

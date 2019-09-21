@@ -7,7 +7,12 @@
 
 
 class XShader {
-
+public:
+    virtual bool Init();
+    //避免头文件引入了OpenGL依赖
+    unsigned int vsh = 0;
+    unsigned int fsh = 0;
+    unsigned int program = 0;
 };
 
 
