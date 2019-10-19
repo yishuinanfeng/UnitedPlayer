@@ -80,7 +80,7 @@ XParameter FFDemux::GetAudioParameter() {
 }
 
 /**
- * 读取一帧数据（注意防止内存泄漏），封装为XData对象
+ * 解复用一帧数据（注意防止内存泄漏），封装为XData对象
  */
 XData FFDemux::Read() {
     XData data;

@@ -13,6 +13,15 @@ public:
     EGLSurface eglSurface = EGL_NO_SURFACE;
     EGLContext eglContext = EGL_NO_CONTEXT;
 
+    virtual void Draw() {
+        if (display == EGL_NO_DISPLAY || eglSurface == EGL_NO_SURFACE) {
+            return;
+        }
+        LOGE("CXEGL Draw");
+        //将surface显示出来
+        eglSwapBuffers(display, eglSurface);
+    }
+
     virtual bool Init(void *win) {
         ANativeWindow *nwin = static_cast<ANativeWindow *>(win);
         //初始化egl
@@ -33,8 +42,8 @@ public:
         LOGI("eglInitialize success!");
 
         //3.1 surface配置，可以理解为窗口
-        EGLConfig eglConfig;
-        EGLint configNum;
+        EGLConfig eglConfig = 0;
+        EGLint configNum = 0;
         EGLint configSpec[] = {
                 EGL_RED_SIZE, 8,
                 EGL_GREEN_SIZE, 8,
@@ -51,7 +60,7 @@ public:
         LOGD("eglCreateWindowSurface success");
 
         //3.2创建surface(egl和NativeWindow进行关联。最后一个参数为属性信息，0表示默认版本)
-        eglSurface = eglCreateWindowSurface(display, eglConfig, nwin, 0);
+        eglSurface = eglCreateWindowSurface(display, eglConfig, nwin, NULL);
         if (eglSurface == EGL_NO_SURFACE) {
             LOGD("eglCreateWindowSurface failed");
             return false;
@@ -91,3 +100,5 @@ XEGL *XEGL::Get() {
     static CXEGL cxegl;
     return &cxegl;
 }
+
+

@@ -15,6 +15,7 @@ class XLog {
 #ifdef ANDROID
 #include <android/log.h>
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
+#define LOGDT(...) __android_log_print(ANDROID_LOG_DEBUG,"texture",__VA_ARGS__)
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
 #else

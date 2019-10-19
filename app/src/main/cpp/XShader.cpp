@@ -5,6 +5,7 @@
 #include "XShader.h"
 #include "XLog.h"
 #include <GLES2/gl2.h>
+#include <ctime>
 
 //顶点着色器(static的意义)
 #define GET_STR(x) #x
@@ -57,9 +58,10 @@ GLuint initShader(const char *source, GLint type) {
     //创建shader
     GLuint sh = glCreateShader(type);
     if (sh == 0) {
-        LOGE("glCreateShader %d failed", type);
+        LOGDT("glCreateShader %d failed", type);
         return 0;
     }
+    LOGDT("GetTexture initShader:%s:",source);
     //加载shader
     glShaderSource(sh,
                    1,//shader数量
@@ -72,34 +74,34 @@ GLuint initShader(const char *source, GLint type) {
     GLint status;
     glGetShaderiv(sh, GL_COMPILE_STATUS, &status);
     if (status == 0) {
-        LOGE("glCompileShader %d failed", type);
-        LOGD("source %s", source);
+        LOGDT("glCompileShader %d failed", type);
+        LOGDT("source %s", source);
         return 0;
     }
 
-    LOGD("glCompileShader %d success", type);
+    LOGDT("glCompileShader %d success", type);
     return sh;
 }
 
 bool XShader::Init() {
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
-        LOGE("initShader GL_VERTEX_SHADER failed");
+        LOGDT("XShader initShader GL_VERTEX_SHADER failed");
         return false;
     }
-    LOGD("initShader GL_VERTEX_SHADER success");
+    LOGDT("XShader initShader GL_VERTEX_SHADER success");
 
     fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
     if (fsh == 0) {
-        LOGE("initShader GL_FRAGMENT_SHADER failed");
+        LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
         return false;
     }
-    LOGD("initShader GL_FRAGMENT_SHADER success");
+    LOGDT("XShader initShader GL_FRAGMENT_SHADER success");
 
     //创建渲染程序
     program = glCreateProgram();
     if (program == 0) {
-        LOGD("glCreateProgram failed");
+        LOGDT("XShader glCreateProgram failed");
         return false;
     }
 
@@ -111,13 +113,36 @@ bool XShader::Init() {
     glLinkProgram(program);
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if (status == 0) {
-        LOGD("glLinkProgram failed");
+    if (status !=  GL_TRUE) {
+        LOGDT("XShader glLinkProgram failed");
         return false;
     }
-    LOGD("glLinkProgram success");
+    LOGDT("XShader glLinkProgram success");
     //激活渲染程序
     glUseProgram(program);
+
+    //加入三维顶点数据
+    static float ver[] = {
+            1.0f, -1.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f
+    };
+
+    GLuint apos = static_cast<GLuint>(glGetAttribLocation(program, "aPosition"));
+    glEnableVertexAttribArray(apos);
+    glVertexAttribPointer(apos, 3, GL_FLOAT, GL_FALSE, 12, ver);
+
+    //加入纹理坐标数据
+    static float fragment[] = {
+            1.0f, 0.0f,
+            0.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f
+    };
+    GLuint aTex = static_cast<GLuint>(glGetAttribLocation(program, "aTextCoord"));
+    glEnableVertexAttribArray(aTex);
+    glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, 8, fragment);
 
     //纹理初始化
     //设置纹理层
@@ -125,6 +150,64 @@ bool XShader::Init() {
     glUniform1i(glGetUniformLocation(program, "uTexture"), 1);
     glUniform1i(glGetUniformLocation(program, "vTexture"), 2);
 
-    LOGD("初始化Shader成功");
+    LOGDT("XShader 初始化Shader成功");
     return true;
+}
+/**
+ * 获取纹理并映射到内存中
+ * @param index
+ * @param width
+ * @param height
+ * @param buf
+ */
+void XShader::GetTexture(unsigned int index, int width, int height, unsigned char *buf) {
+   // LOGD("XShader GetTexture width:%d,,height:%d,buf:%x" ,width ,height,buf);
+    if (text[index] == 0){
+        glGenTextures(1,&text[index]);
+        //LOGD("XShader GetTexture texture id:%d:",text[index]);
+        //绑定纹理。后面的的设置和加载全部作用于当前绑定的纹理对象
+        //GL_TEXTURE0、GL_TEXTURE1、GL_TEXTURE2 的就是纹理单元，GL_TEXTURE_1D、GL_TEXTURE_2D、CUBE_MAP为纹理目标
+        //通过 glBindTexture 函数将纹理目标和纹理绑定后，对纹理目标所进行的操作都反映到对纹理上
+        glBindTexture(GL_TEXTURE_2D, text[index]);
+        //缩小的过滤器
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        //放大的过滤器
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //设置纹理的格式和大小
+        // 加载纹理到 OpenGL，读入 buffer 定义的位图数据，并把它复制到当前绑定的纹理对象
+        // 当前绑定的纹理对象就会被附加上纹理图像。
+        //width,height表示每几个像素公用一个yuv元素？比如width / 2表示横向每两个像素使用一个元素？
+        glTexImage2D(GL_TEXTURE_2D,
+                     0,//细节基本 默认0
+                     GL_LUMINANCE,//gpu内部格式 亮度，灰度图（这里就是只取一个亮度的颜色通道的意思）
+                     width,//加载的纹理宽度。最好为2的次幂
+                     height,//加载的纹理高度。最好为2的次幂
+                     0,//纹理边框
+                     GL_LUMINANCE,//数据的像素格式 亮度，灰度图
+                     GL_UNSIGNED_BYTE,//像素点存储的数据类型
+                     nullptr //纹理的数据（先不传）
+        );
+    }
+  //  LOGD("XShader glActiveTexture");
+    //激活第一层纹理，绑定到创建的纹理
+    //下面的width,height主要是显示尺寸？
+    glActiveTexture(GL_TEXTURE0 + index);
+    //绑定纹理
+    glBindTexture(GL_TEXTURE_2D, text[index]);
+    //替换纹理，比重新使用glTexImage2D性能高多
+    LOGDT("GetTexture width:%d, height:%d",width, height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0,
+                    0, 0,//相对原来的纹理的offset
+                    width, height,//加载的纹理宽度、高度。最好为2的次幂
+                    GL_LUMINANCE, GL_UNSIGNED_BYTE,
+                    buf);
+}
+
+void XShader::Draw() {
+    if (!program) {
+        return;
+    }
+    LOGE("xShader Draw");
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
