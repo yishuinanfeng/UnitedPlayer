@@ -11,6 +11,8 @@
 #include "GLVideoView.h"
 #include "IResample.h"
 #include "FFResample.h"
+#include "IAudioPlay.h"
+#include "SLAudioPlay.h"
 #include <android/native_window_jni.h>
 
 IVideoView *iVideoView = NULL;
@@ -39,8 +41,14 @@ Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
     videoDecode->AddOberver(iVideoView);
 
     IResample *resample = new FFResample();
-    resample->Open(iDemux->GetAudioParameter());
+    XParameter outPara = iDemux->GetAudioParameter();
+    resample->Open(iDemux->GetAudioParameter(), outPara);
     audioDecode->AddOberver(resample);
+    IAudioPlay *audioPlay = new SLAudioPlay();
+    audioPlay->StartPlay(outPara);
+    resample->AddOberver(audioPlay);
+
+
 
     iDemux->Start();
     audioDecode->Start();

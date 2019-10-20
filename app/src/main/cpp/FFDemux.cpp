@@ -38,6 +38,7 @@ bool FFDemux::Open(const char *url) {
     GetVideoParameter();
     return true;
 }
+
 /**
  * 找出视频流videoStreamIndex和参数信息
  * @return
@@ -58,6 +59,7 @@ XParameter FFDemux::GetVideoParameter() {
     xParameter.parameters = ic->streams[re]->codecpar;
     return xParameter;
 }
+
 /**
  * 找出音频流audioStreamIndex和参数信息
  * @return
@@ -76,6 +78,8 @@ XParameter FFDemux::GetAudioParameter() {
     audioStreamIndex = re;
     XParameter xParameter;
     xParameter.parameters = ic->streams[re]->codecpar;
+    xParameter.channels = ic->streams[re]->codecpar->channels;
+    xParameter.sample_rate = ic->streams[re]->codecpar->sample_rate;
     return xParameter;
 }
 

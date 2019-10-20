@@ -33,8 +33,9 @@ bool XData::Alloc(int size, const char *d) {
         return false;
     }
     this->data = new unsigned char[size];
-    if (d){
-        memcpy(this->data,d,size);
+    if (d) {
+        memcpy(this->data, d, size);
     }
+    this->size = size;
     return true;
 }

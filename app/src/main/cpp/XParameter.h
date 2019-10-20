@@ -12,6 +12,8 @@ class XParameter {
 public:
     //描述一个编码流的属性信息
     AVCodecParameters *parameters = 0;
+    int channels = 2;
+    int sample_rate = 44100;
 };
 
 

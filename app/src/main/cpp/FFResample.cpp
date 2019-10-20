@@ -15,9 +15,9 @@ bool FFResample::Open(XParameter in, XParameter out) {
     swrContext = swr_alloc();
     AVCodecParameters *p = in.parameters;
     //参数前一部分是输出，后一部分是输入
-    swrContext = swr_alloc_set_opts(swrContext, av_get_default_channel_layout(2),
+    swrContext = swr_alloc_set_opts(swrContext, av_get_default_channel_layout(out.channels),
                                     AV_SAMPLE_FMT_S16,
-                                    p->sample_rate,
+                                    out.sample_rate,
                                     av_get_default_channel_layout(p->channels),
                                     static_cast<AVSampleFormat>(p->format),
                                     p->sample_rate, 0, 0);
@@ -33,7 +33,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
 }
 
 XData FFResample::Resample(XData xData) {
-    LOGD("Resample XData size:%d", xData.size);
+  //  LOGD("Resample XData size:%d", xData.size);
     if (xData.size <= 0 || !xData.data) {
         return XData();
     }
@@ -61,6 +61,6 @@ XData FFResample::Resample(XData xData) {
         out.Drop();
         return XData();
     }
-    LOGD("Resample success：%d", outSize);
+ //   LOGD("Resample success：%d", outSize);
     return out;
 }
