@@ -9,6 +9,8 @@
 #include "XShader.h"
 #include "IVideoView.h"
 #include "GLVideoView.h"
+#include "IResample.h"
+#include "FFResample.h"
 #include <android/native_window_jni.h>
 
 IVideoView *iVideoView = NULL;
@@ -35,6 +37,10 @@ Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
     iVideoView = new GLVideoView();
     //解码一帧之后，通知显示模块
     videoDecode->AddOberver(iVideoView);
+
+    IResample *resample = new FFResample();
+    resample->Open(iDemux->GetAudioParameter());
+    audioDecode->AddOberver(resample);
 
     iDemux->Start();
     audioDecode->Start();

@@ -11,7 +11,7 @@
 #include <mutex>
 
 /**
- * 观察者
+ * 既是观察者又是被观察者
  */
 class IObserver :public XThread{
 public:
