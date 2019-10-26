@@ -51,6 +51,58 @@ static const char *fragYUV420P = GET_STR(
         }
 );
 
+static const char *fragNV12 = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uvTexture;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
+            yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+            gl_FragColor = vec4(rgb, 1.0);
+        }
+);
+
+static const char *fragNV21 = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uvTexture;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uvTexture, vTextCoord).a - 0.5;
+            yuv.b = texture2D(uvTexture, vTextCoord).r - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+            gl_FragColor = vec4(rgb, 1.0);
+        }
+);
+
 GLuint initShader(const char *source, int type);
 
 
@@ -61,7 +113,7 @@ GLuint initShader(const char *source, GLint type) {
         LOGDT("glCreateShader %d failed", type);
         return 0;
     }
-    LOGDT("GetTexture initShader:%s:",source);
+    LOGDT("GetTexture initShader:%s:", source);
     //加载shader
     glShaderSource(sh,
                    1,//shader数量
@@ -90,8 +142,20 @@ bool XShader::Init(XShaderType shaderType) {
         return false;
     }
     LOGDT("XShader initShader GL_VERTEX_SHADER success");
-
-    fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+    switch (shaderType) {
+        case XSHDER_YUV420P:
+            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+            break;
+        case XSHDER_NV12:
+            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+            break;
+        case XSHDER_NV21:
+            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+            break;
+        default:
+            LOGDT("XShaderType is error");
+            return false;
+    }
     if (fsh == 0) {
         LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
         return false;
@@ -113,7 +177,7 @@ bool XShader::Init(XShaderType shaderType) {
     glLinkProgram(program);
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if (status !=  GL_TRUE) {
+    if (status != GL_TRUE) {
         LOGDT("XShader glLinkProgram failed");
         return false;
     }
@@ -146,13 +210,25 @@ bool XShader::Init(XShaderType shaderType) {
 
     //纹理初始化
     //设置纹理层
+
     glUniform1i(glGetUniformLocation(program, "yTexture"), 0);
-    glUniform1i(glGetUniformLocation(program, "uTexture"), 1);
-    glUniform1i(glGetUniformLocation(program, "vTexture"), 2);
+    switch (shaderType) {
+        case XSHDER_YUV420P:
+            glUniform1i(glGetUniformLocation(program, "uTexture"), 1);
+            glUniform1i(glGetUniformLocation(program, "vTexture"), 2);
+            break;
+        case XSHDER_NV12:
+        case XSHDER_NV21:
+            //NV12,NV21只需要两层纹理（因为数据只有数组？）
+            glUniform1i(glGetUniformLocation(program, "uvTexture"), 1);
+            break;
+
+    }
 
     LOGDT("XShader 初始化Shader成功");
     return true;
 }
+
 /**
  * 获取纹理并映射到内存中
  * @param index
@@ -160,10 +236,16 @@ bool XShader::Init(XShaderType shaderType) {
  * @param height
  * @param buf
  */
-void XShader::GetTexture(unsigned int index, int width, int height, unsigned char *buf) {
-   // LOGD("XShader GetTexture width:%d,,height:%d,buf:%x" ,width ,height,buf);
-    if (text[index] == 0){
-        glGenTextures(1,&text[index]);
+void XShader::GetTexture(unsigned int index, int width, int height, unsigned char *buf, bool isA) {
+    // LOGD("XShader GetTexture width:%d,,height:%d,buf:%x" ,width ,height,buf);
+    //gpu内部格式 亮度，灰度图（这里就是按照亮度值存储纹理单元 ，只取一个亮度的颜色通道的意思），格式默认为灰度
+    unsigned int format = GL_LUMINANCE;
+    if (isA) {
+        //带透明通道，按照亮度和alpha值存储纹理单元
+        format = GL_LUMINANCE_ALPHA;
+    }
+    if (text[index] == 0) {
+        glGenTextures(1, &text[index]);
         //LOGD("XShader GetTexture texture id:%d:",text[index]);
         //绑定纹理。后面的的设置和加载全部作用于当前绑定的纹理对象
         //GL_TEXTURE0、GL_TEXTURE1、GL_TEXTURE2 的就是纹理单元，GL_TEXTURE_1D、GL_TEXTURE_2D、CUBE_MAP为纹理目标
@@ -179,27 +261,27 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
         //width,height表示每几个像素公用一个yuv元素？比如width / 2表示横向每两个像素使用一个元素？
         glTexImage2D(GL_TEXTURE_2D,
                      0,//细节基本 默认0
-                     GL_LUMINANCE,//gpu内部格式 亮度，灰度图（这里就是只取一个亮度的颜色通道的意思）
+                     format,//gpu内部格式 亮度，灰度图（这里就是只取一个亮度的颜色通道的意思）
                      width,//加载的纹理宽度。最好为2的次幂
                      height,//加载的纹理高度。最好为2的次幂
                      0,//纹理边框
-                     GL_LUMINANCE,//数据的像素格式 亮度，灰度图
+                     format,//数据的像素格式 亮度，灰度图
                      GL_UNSIGNED_BYTE,//像素点存储的数据类型
                      nullptr //纹理的数据（先不传）
         );
     }
-  //  LOGD("XShader glActiveTexture");
+    //  LOGD("XShader glActiveTexture");
     //激活第一层纹理，绑定到创建的纹理
     //下面的width,height主要是显示尺寸？
     glActiveTexture(GL_TEXTURE0 + index);
     //绑定纹理
     glBindTexture(GL_TEXTURE_2D, text[index]);
     //替换纹理，比重新使用glTexImage2D性能高多
-    LOGDT("GetTexture width:%d, height:%d",width, height);
+    LOGDT("GetTexture width:%d, height:%d", width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0,
                     0, 0,//相对原来的纹理的offset
                     width, height,//加载的纹理宽度、高度。最好为2的次幂
-                    GL_LUMINANCE, GL_UNSIGNED_BYTE,
+                    format, GL_UNSIGNED_BYTE,
                     buf);
 }
 

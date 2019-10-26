@@ -14,8 +14,8 @@ enum XShaderType {
 class XShader {
 public:
     virtual bool Init(XShaderType shaderType = XSHDER_YUV420P);
-
-    void GetTexture(unsigned int index, int width, int height, unsigned char *buf);
+    //初始化绑定纹理  isA表示是否有透明通道（NV12,NV21）
+    void GetTexture(unsigned int index, int width, int height, unsigned char *buf, bool isA = false);
 
     //避免头文件引入了OpenGL依赖
     unsigned int vsh = 0;
