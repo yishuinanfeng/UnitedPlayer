@@ -9,6 +9,7 @@
  */
 enum XDataType{
     AVPACKET_TYPE = 0,
+    //非AcPacket类
     UCHAR_TYPE = 1
 };
 /**
@@ -22,6 +23,8 @@ struct XData {
     bool isAudio = false;
     int width;
     int height;
+    //区分视频帧格式（yuv420p,nv12,nv21）
+    int format = 0;
     void Drop();
     bool Alloc(int size, const char *data = 0);
 };

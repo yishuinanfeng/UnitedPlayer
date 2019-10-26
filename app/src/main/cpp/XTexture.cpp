@@ -11,7 +11,7 @@ class CXTexture : public XTexture {
 public:
     XShader xShader;
 
-    virtual bool Init(void *win) {
+    virtual bool Init(void *win,XTextureType textureType) {
         if (!win) {
             LOGE("CXTexture win is NULL！");
         }

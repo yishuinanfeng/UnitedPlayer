@@ -83,7 +83,7 @@ GLuint initShader(const char *source, GLint type) {
     return sh;
 }
 
-bool XShader::Init() {
+bool XShader::Init(XShaderType shaderType) {
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
         LOGDT("XShader initShader GL_VERTEX_SHADER failed");

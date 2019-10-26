@@ -3,28 +3,39 @@
 //
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavcodec/jni.h>
 }
+
 
 #include "FFDecode.h"
 #include "XLog.h"
+
+void FFDecode::InitHard(void *vm) {
+    av_jni_set_java_vm(vm, 0);
+    LOGD("InitHard");
+}
+
 
 /**
  * 打开解码器
  * @param xParameter
  * @return
  */
-bool FFDecode::Open(XParameter xParameter) {
+bool FFDecode::Open(XParameter xParameter, bool isHard) {
     if (!xParameter.parameters) {
         return false;
     }
     //1.查找解码器
     AVCodecParameters *p = xParameter.parameters;
     AVCodec *cd = avcodec_find_decoder(p->codec_id);
+    if (isHard) {
+        cd = avcodec_find_decoder_by_name("h264_mediacodec");
+    }
     if (!cd) {
-        LOGE("avcodec_find_decoder %d failed", p->codec_id);
+        LOGE("avcodec_find_decoder %d failed", p->codec_id, isHard);
         return false;
     }
-    LOGI("avcodec_find_decoder success!");
+    LOGI("avcodec_find_decoder success! %d",isHard);
     //2 创建解码器上下文，并复制参数
     codecContext = avcodec_alloc_context3(cd);
     //因为新的版本已经将AVStream结构体中的AVCodecContext字段定义为废弃属性，
@@ -92,8 +103,14 @@ XData FFDecode::RecvFrame() {
         xData.size = av_get_bytes_per_sample(static_cast<AVSampleFormat>(avFrame->format)) *
                      avFrame->nb_samples * 2;
     }
+    xData.format = avFrame->format;
+    if (!isAudio) {
+        LOGD("data format is %d", avFrame->format);
+    }
     //将avFrame的具体音视频数据拷贝到xData.datas中（两个数组大小都是8）
     memcpy(xData.datas, avFrame->data, sizeof(xData.datas));
     return xData;
 }
+
+
 

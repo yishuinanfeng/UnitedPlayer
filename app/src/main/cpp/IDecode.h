@@ -15,8 +15,8 @@
  */
 class IDecode: public IObserver {
 public:
-    //打开解码器
-    virtual bool Open(XParameter xParameter) = 0;
+    //打开解码器.isHard:视频是否需要硬解码
+    virtual bool Open(XParameter xParameter, bool isHard = false) = 0;
     //Future模式
     virtual bool SendPacket(XData pkt) = 0;
     //从线程中获取解码结果

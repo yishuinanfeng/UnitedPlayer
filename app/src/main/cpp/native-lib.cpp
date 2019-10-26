@@ -16,6 +16,12 @@
 #include <android/native_window_jni.h>
 
 IVideoView *iVideoView = NULL;
+//当当前动态库被load的时候会调用该函数
+extern "C" JNIEXPORT
+jint JNI_OnLoad(JavaVM *vm, void *res){
+    FFDecode::InitHard(vm);
+    return JNI_VERSION_1_4;
+}
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
@@ -30,7 +36,7 @@ Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
     audioDecode->Open(iDemux->GetAudioParameter());
 
     IDecode *videoDecode = new FFDecode();
-    videoDecode->Open(iDemux->GetVideoParameter());
+    videoDecode->Open(iDemux->GetVideoParameter(), true);
 
     //解复用一帧之后，通知解码器
     iDemux->AddOberver(audioDecode);
