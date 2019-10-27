@@ -7,6 +7,7 @@
 #include <thread>
 
 using namespace std;
+
 /**
  * 延时，本质为释放cpu资源，让cpu休息
  * @param mis
@@ -17,11 +18,13 @@ void Sleep(int mis) {
 }
 
 //启动线程
-void XThread::Start() {
+bool XThread::Start() {
     //创建线程
     isExit = false;
     thread th(&XThread::ThreadMain, this);
+    //当前线程成为守护线程
     th.detach();
+    return true;
 }
 
 //停止线程，通过标志位（不一定成功）

@@ -11,7 +11,7 @@ void Sleep(int mis);
 class XThread {
 public:
     //启动线程
-    virtual void Start();
+    virtual bool Start();
 
     //停止线程，通过标志位（不一定成功）
     virtual void Stop();

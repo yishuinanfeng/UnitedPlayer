@@ -15,6 +15,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
     swrContext = swr_alloc();
     AVCodecParameters *p = in.parameters;
     //参数前一部分是输出，后一部分是输入
+    //这里声道数和采样率不变，只修改采样格式
     swrContext = swr_alloc_set_opts(swrContext, av_get_default_channel_layout(out.channels),
                                     AV_SAMPLE_FMT_S16,
                                     out.sample_rate,

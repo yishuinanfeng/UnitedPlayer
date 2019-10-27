@@ -65,8 +65,10 @@ static const char *fragNV12 = GET_STR(
             vec3 yuv;
             vec3 rgb;
             //分别取yuv各个分量的采样纹理（r表示？）
+            //这里texture2D(yTexture, vTextCoord).r取.g.b效果也是一样的
             yuv.r = texture2D(yTexture, vTextCoord).r;
             yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
+            //NV12会把V采样到a通道
             yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
             rgb = mat3(
                     1.0, 1.0, 1.0,
