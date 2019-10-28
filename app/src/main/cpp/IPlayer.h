@@ -26,7 +26,7 @@ class IAudioPlay;
 class IPlayer : public XThread {
 public:
     //index为窗口索引
-    static IPlayer *Get(unsigned char index = 0);
+    static IPlayer *Get(unsigned int index = 0);
 
     virtual bool Open(const char *path);
 

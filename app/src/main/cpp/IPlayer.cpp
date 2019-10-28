@@ -11,7 +11,7 @@
 #include "IVideoView.h"
 
 //最推荐的懒汉式单例(magic static )——局部静态变量,是线程安全的（为什么？）
-IPlayer *IPlayer::Get(unsigned char index) {
+IPlayer *IPlayer::Get(unsigned int index) {
     static IPlayer p[256];
     return &p[index];
 }
