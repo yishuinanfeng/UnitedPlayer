@@ -14,6 +14,8 @@ static double r2d(AVRational r) {
 
 //打开文件或者流媒体 rmtp rtsp http
 bool FFDemux::Open(const char *url) {
+    Close();
+    mux.lock();
     LOGI("open file %s", url);
     //创建了一个AVFormatContext,并读取文件的头部信息
     int re = avformat_open_input(&ic, url, 0, 0);
@@ -21,6 +23,7 @@ bool FFDemux::Open(const char *url) {
         char buf[1024] = {0};
         av_strerror(re, buf, sizeof(buf));
         LOGE("FFDemux open %s failed!", url);
+        mux.unlock();
         return false;
     }
     LOGI("FFDemux open %s success!", url);
@@ -31,6 +34,7 @@ bool FFDemux::Open(const char *url) {
         char buf[1024] = {0};
         av_strerror(re, buf, sizeof(buf));
         LOGE("avformat_find_stream_info %s failed!", url);
+        mux.unlock();
         return false;
     }
     LOGI("avformat_find_stream_info %s success!", url);
@@ -38,6 +42,8 @@ bool FFDemux::Open(const char *url) {
     this->totalMs = ic->duration / (AV_TIME_BASE / 1000);
     LOGI("avformat_find_stream_info  totalMs:%d", totalMs);
     //获取video和audio stream的index
+    mux.unlock();
+    //get里面有其他的锁，这里在之前unlock防止死锁
     GetAudioParameter();
     GetVideoParameter();
     return true;
@@ -48,6 +54,7 @@ bool FFDemux::Open(const char *url) {
  * @return
  */
 XParameter FFDemux::GetVideoParameter() {
+    mux.lock();
     if (!ic) {
         LOGE("GetVideoParameter failed!ic is null");
         return XParameter();
@@ -56,11 +63,13 @@ XParameter FFDemux::GetVideoParameter() {
     int re = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0);
     if (re < 0) {
         LOGE("av_find_best_stream failed!");
+        mux.unlock();
         return XParameter();
     }
     videoStreamIndex = re;
     XParameter xParameter;
     xParameter.parameters = ic->streams[re]->codecpar;
+    mux.unlock();
     return xParameter;
 }
 
@@ -69,6 +78,7 @@ XParameter FFDemux::GetVideoParameter() {
  * @return
  */
 XParameter FFDemux::GetAudioParameter() {
+    mux.lock();
     if (!ic) {
         LOGE("GetVideoParameter failed!ic is null");
         return XParameter();
@@ -77,6 +87,7 @@ XParameter FFDemux::GetAudioParameter() {
     int re = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, 0, 0);
     if (re < 0) {
         LOGE("av_find_best_stream failed!");
+        mux.unlock();
         return XParameter();
     }
     audioStreamIndex = re;
@@ -84,6 +95,7 @@ XParameter FFDemux::GetAudioParameter() {
     xParameter.parameters = ic->streams[re]->codecpar;
     xParameter.channels = ic->streams[re]->codecpar->channels;
     xParameter.sample_rate = ic->streams[re]->codecpar->sample_rate;
+    mux.unlock();
     return xParameter;
 }
 
@@ -91,6 +103,7 @@ XParameter FFDemux::GetAudioParameter() {
  * 解复用一帧数据（注意防止内存泄漏），封装为XData对象
  */
 XData FFDemux::Read() {
+    mux.lock();
     XData data;
     if (!ic) {
         return XData();
@@ -100,6 +113,7 @@ XData FFDemux::Read() {
     int re = av_read_frame(ic, pkt);
     if (re != 0) {
         av_packet_free(&pkt);
+        mux.unlock();
         return XData();
     }
     LOGI("packet size:%d pts:%lld", pkt->size, pkt->pts);
@@ -112,6 +126,7 @@ XData FFDemux::Read() {
         data.isAudio = true;
     } else {
         av_packet_free(&pkt);
+        mux.unlock();
         return XData();
     }
     //time_base单位为秒，这里转为毫秒
@@ -119,6 +134,7 @@ XData FFDemux::Read() {
     pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     data.pts = static_cast<int>(pkt->pts);
     LOGD("demux pts %d", data.pts);
+    mux.unlock();
     return data;
 }
 
@@ -134,6 +150,14 @@ FFDemux::FFDemux() {
         avformat_network_init();
         LOGI("register ffmpeg");
     }
+}
+
+void FFDemux::Close() {
+    mux.lock();
+    if (ic) {
+        avformat_close_input(&ic);
+    }
+    mux.unlock();
 }
 
 
