@@ -153,11 +153,11 @@ FFDemux::FFDemux() {
 }
 
 void FFDemux::Close() {
-mux.lock();
-if (ic) {
-avformat_close_input(&ic);
-}
-mux.unlock();
+    mux.lock();
+    if (ic) {
+        avformat_close_input(&ic);
+    }
+    mux.unlock();
 }
 
 
