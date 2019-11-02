@@ -5,6 +5,7 @@
 #ifndef MANCHESTERUNITEDPLAYER_IPLAYER_H
 #define MANCHESTERUNITEDPLAYER_IPLAYER_H
 
+#include <mutex>
 #include "XThread.h"
 #include "XParameter.h"
 
@@ -46,6 +47,10 @@ public:
 
     bool isHardDecode = true;
 
+protected:
+    //用作音视频同步
+    void Main();
+    std::mutex mutex;
     IPlayer();
 };
 

@@ -34,11 +34,13 @@ XData IAudioPlay::GetData() {
             data = framelist.front();
             framelist.pop_front();
             frameMutex.unlock();
+            pst = data.pts;
             return data;
         }
         frameMutex.unlock();
         //停顿下，为了减轻cpu负荷
         Sleep(1);
     }
+    //未获取到数据
     return data;
 }

@@ -35,7 +35,7 @@ bool FFDecode::Open(XParameter xParameter, bool isHard) {
         LOGE("avcodec_find_decoder %d failed", p->codec_id, isHard);
         return false;
     }
-    LOGI("avcodec_find_decoder success! %d",isHard);
+    LOGI("avcodec_find_decoder success! %d", isHard);
     //2 创建解码器上下文，并复制参数
     codecContext = avcodec_alloc_context3(cd);
     //因为新的版本已经将AVStream结构体中的AVCodecContext字段定义为废弃属性，
@@ -86,12 +86,13 @@ XData FFDecode::RecvFrame() {
     if (!avFrame) {
         avFrame = av_frame_alloc();
     }
-    //avFrame得到解码之后的一帧，将avcodec_send_packet的一帧解码到avFrame
+    //得到解码之后的一帧，将avcodec_send_packet的一帧解码到avFrame
     int re = avcodec_receive_frame(codecContext, avFrame);
     if (re != 0) {
         return XData();
     }
     XData xData;
+    //todo 直接强转？
     xData.data = reinterpret_cast<unsigned char *>(avFrame);
     if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         xData.size = (avFrame->linesize[0] + avFrame->linesize[1] + avFrame->linesize[2]) *
@@ -109,6 +110,7 @@ XData FFDecode::RecvFrame() {
     }
     //将avFrame的具体音视频数据拷贝到xData.datas中（两个数组大小都是8）
     memcpy(xData.datas, avFrame->data, sizeof(xData.datas));
+    xData.pts = avFrame->pts;
     return xData;
 }
 

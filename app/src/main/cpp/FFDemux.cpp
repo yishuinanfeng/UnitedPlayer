@@ -8,6 +8,10 @@ extern "C" {
 #include "FFDemux.h"
 #include "XLog.h"
 
+static double r2d(AVRational r) {
+    return r.num == 0 || r.den == 0 ? 0. : (double) r.num / (double) r.den;
+}
+
 //打开文件或者流媒体 rmtp rtsp http
 bool FFDemux::Open(const char *url) {
     LOGI("open file %s", url);
@@ -110,6 +114,11 @@ XData FFDemux::Read() {
         av_packet_free(&pkt);
         return XData();
     }
+    //time_base单位为秒，这里转为毫秒
+    pkt->pts = pkt->pts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
+    pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
+    data.pts = static_cast<int>(pkt->pts);
+    LOGD("demux pts %d", data.pts);
     return data;
 }
 

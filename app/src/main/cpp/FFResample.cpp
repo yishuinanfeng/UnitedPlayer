@@ -34,7 +34,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
 }
 
 XData FFResample::Resample(XData xData) {
-  //  LOGD("Resample XData size:%d", xData.size);
+    //  LOGD("Resample XData size:%d", xData.size);
     if (xData.size <= 0 || !xData.data) {
         return XData();
     }
@@ -51,8 +51,9 @@ XData FFResample::Resample(XData xData) {
         return XData();
     }
     out.Alloc(outSize);
+    //存放两个uint8_t指针
     uint8_t *outArr[2] = {0};
-    //重采样后的数据存放在out.data
+    //第一个uint8_t指针等于out.data，所以重采样后的数据存放在out.data
     outArr[0] = out.data;
     //todo 为什么转型不能用retraincast?
     //对一帧的音频进行重采样。 frame->nb_samples表示单通道的样本数量
@@ -62,6 +63,7 @@ XData FFResample::Resample(XData xData) {
         out.Drop();
         return XData();
     }
- //   LOGD("Resample success：%d", outSize);
+    out.pts = xData.pts;
+    //   LOGD("Resample success：%d", outSize);
     return out;
 }

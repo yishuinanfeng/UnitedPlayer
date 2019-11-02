@@ -18,6 +18,7 @@ public:
     //获取缓冲数据，如没有则阻塞
     virtual XData GetData();
     int maxFrame = 100;
+    int pst = 0;
 protected:
     std::list <XData> framelist;
     std::mutex frameMutex;

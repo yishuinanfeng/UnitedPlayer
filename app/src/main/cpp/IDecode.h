@@ -27,6 +27,10 @@ public:
     bool isAudio = false;
     //缓冲队列最大数量
     int packMaxCount = 100;
+    //当前播放的音频帧pts
+    int synPts = 0;
+    //当前解码出来的一帧的pts
+    int pts = 0;
 
 protected:
     virtual void Main();

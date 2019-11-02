@@ -12,7 +12,7 @@ void IDecode::Update(XData pkt) {
     if (pkt.isAudio != isAudio) {
         return;
     }
-    LOGE("Update isAudio %d",isAudio);
+    LOGE("Update isAudio %d", isAudio);
     //如果队列满了，则不能添加元素，循环等待队列不满的时候再添加。阻塞队列的功能。
     while (!isExit) {
         packsMutex.lock();
@@ -33,6 +33,17 @@ void IDecode::Update(XData pkt) {
 void IDecode::Main() {
     while (!isExit) {
         packsMutex.lock();
+
+        //音视频同步
+        if (!isAudio && synPts > 0) {
+            //如果正在播放的音频帧的pts小于的刚解码出来的视频帧pts，则等待直到播放的音频帧不小于再解码视频帧
+            if (synPts < pts) {
+                packsMutex.unlock();
+                Sleep(1);
+                continue;
+            }
+        }
+
         if (packList.empty()) {
             packsMutex.unlock();
             continue;
@@ -41,7 +52,7 @@ void IDecode::Main() {
         XData pack = packList.front();
         packList.pop_front();
 
-        LOGE("Main pack size is %d",pack.size);
+        LOGE("Main pack size is %d", pack.size);
 
         if (this->SendPacket(pack)) {
             //发送一个Packet可能会Receive到多个Frame(一般是音频，视频一般一个Packet对应一个Frame)
@@ -51,8 +62,9 @@ void IDecode::Main() {
                 if (!frame.data) {
                     break;
                 }
-                LOGE("RecvFrame size is %d",frame.size);
-
+                LOGE("RecvFrame size is %d", frame.size);
+                //每次解码后将当前帧的pts保存
+                pts = frame.pts;
                 notify(frame);
             }
         }

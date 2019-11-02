@@ -17,8 +17,11 @@ IPlayer *IPlayer::Get(unsigned int index) {
 }
 
 bool IPlayer::Open(const char *path) {
+    mutex.lock();
     if (!iDemux || !iDemux->Open(path)) {
         LOGE("demux open %s fail", path);
+        //return都要unlock
+        mutex.unlock();
         return false;
     }
     //下面这几个之所以没有return false，是因为可能是不需要解码或重采样的原始数据
@@ -35,6 +38,7 @@ bool IPlayer::Open(const char *path) {
     if (!resample || !resample->Open(iDemux->GetAudioParameter(), outPara)) {
         LOGE("resample open %s fail", path);
     }
+    mutex.unlock();
     return true;
 }
 
@@ -43,8 +47,11 @@ bool IPlayer::Start() {
     //    iDemux->Start();
 //    audioDecode->Start();
 //    videoDecode->Start();
+    mutex.lock();
     if (!iDemux || !iDemux->Start()) {
         LOGE("iDemux->Start fail");
+        //return都要unlock
+        mutex.unlock();
         return false;
     }
     if (audioDecode) {
@@ -56,6 +63,8 @@ bool IPlayer::Start() {
     if (videoDecode) {
         videoDecode->Start();
     }
+    XThread::Start();
+    mutex.unlock();
     return true;
 }
 
@@ -68,6 +77,24 @@ bool IPlayer::InitView(void *win) {
         videoView->SetRender(win);
     }
     return true;
+}
+
+void IPlayer::Main() {
+    while (!isExit) {
+        mutex.lock();
+        //在player中将当前音频player的当前帧的pts赋值给视频解码器
+        if (!audioPlay || !videoDecode) {
+            mutex.unlock();
+            continue;
+        }
+        //将当前音频帧pts赋值给视频解码器的synPts
+        int apts = audioPlay->pst;
+        videoDecode->synPts = apts;
+        LOGD("apts = %d", apts);
+        mutex.unlock();
+        Sleep(2);
+    }
+
 }
 
 

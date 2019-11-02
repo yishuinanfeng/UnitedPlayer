@@ -19,6 +19,7 @@ struct XData {
     int type = 0;
     unsigned char *data = 0;
     unsigned char *datas[8] = {0};
+    int pts = 0;
     int size = 0;
     bool isAudio = false;
     int width;
