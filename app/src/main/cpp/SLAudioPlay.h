@@ -9,16 +9,21 @@
 #include <list>
 #include "IAudioPlay.h"
 
-class SLAudioPlay: public IAudioPlay {
+class SLAudioPlay : public IAudioPlay {
 public:
     virtual bool StartPlay(XParameter out);
+
     virtual void PlayCall(void *bufq);
 
+    virtual void Close();
+
     SLAudioPlay();
+
     virtual ~SLAudioPlay();
 
 protected:
     unsigned char *buf = 0;
+    std::mutex mutex1;
 };
 
 

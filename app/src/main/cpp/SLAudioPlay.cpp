@@ -10,7 +10,9 @@
 static SLObjectItf objectItf = NULL;
 static SLEngineItf eng = NULL;
 static SLObjectItf mix = NULL;
+//播放器对象
 static SLObjectItf player = NULL;
+//播放器接口
 static SLPlayItf iPlayer = NULL;
 static SLAndroidSimpleBufferQueueItf pcmQueue = NULL;
 
@@ -34,7 +36,10 @@ static SLEngineItf CreateSl() {
 
     return engineItf;
 }
-
+/**
+ * 获得缓存的解码重采样后的数据，将数据添加到OpenSl的播放队列中
+ * @param bufq
+ */
 void SLAudioPlay::PlayCall(void *bufq) {
     if (!bufq) {
         LOGA("PlayCall fail");
@@ -47,13 +52,16 @@ void SLAudioPlay::PlayCall(void *bufq) {
         LOGA("PlayCall GetData size is 0");
         return;
     }
-    if (!buf){
+    if (!buf) {
         LOGA("buf is NULL");
         return;
     }
     LOGA("PlayCall Enqueue");
+    //保护buf？
+    mutex1.lock();
     memcpy(buf, xData.data, static_cast<size_t>(xData.size));
     (*bufferQueueItf)->Enqueue(bufferQueueItf, buf, static_cast<SLuint32>(xData.size));
+    mutex1.unlock();
     xData.Drop();
 }
 
@@ -69,12 +77,15 @@ static void PcmCall(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *contex) 
 }
 
 bool SLAudioPlay::StartPlay(XParameter out) {
+    Close();
     //创建引擎
+    mutex1.lock();
     eng = CreateSl();
     if (eng) {
         LOGA("CreateSL success");
     } else {
         LOGA("CreateSL fail");
+        mutex1.unlock();
         return false;
     }
 
@@ -83,12 +94,14 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     sLresult = (*eng)->CreateOutputMix(eng, &mix, 0, 0, 0);
     if (sLresult != SL_RESULT_SUCCESS) {
         LOGA("CreateOutputMix fail");
+        mutex1.unlock();
         return false;
     }
 
     sLresult = (*mix)->Realize(mix, SL_BOOLEAN_FALSE);
     if (sLresult != SL_RESULT_SUCCESS) {
         LOGA("mix Realize fail");
+        mutex1.unlock();
         return false;
     }
 
@@ -114,6 +127,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     //创建播放器
     const SLInterfaceID ids[] = {SL_IID_BUFFERQUEUE};
     const SLboolean req[] = {SL_BOOLEAN_TRUE};
+    //todo player初始值为NULL，怎么可以直接&player？
     sLresult = (*eng)->CreateAudioPlayer(eng, &player, &dataSource, &slDataSink, sizeof(ids) /
                                                                                  sizeof(SLInterfaceID),
                                          ids, req);
@@ -121,6 +135,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("CreateAudioPlayer success");
     } else {
         LOGA("CreateAudioPlayer fail");
+        mutex1.unlock();
         return false;
     }
 
@@ -130,6 +145,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("GetInterface SL_IID_PLAY success");
     } else {
         LOGA("GetInterface SL_IID_PLAY fail");
+        mutex1.unlock();
         return false;
     }
     //获得缓冲队列接口
@@ -138,6 +154,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("Create SL_IID_BUFFERQUEUE success");
     } else {
         LOGA("Create SL_IID_BUFFERQUEUE fail");
+        mutex1.unlock();
         return false;
     }
 
@@ -149,6 +166,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     //加入空字符串启动队列回调
     (*pcmQueue)->Enqueue(pcmQueue, "", 1);
     LOGA("StartPlay success!");
+    mutex1.unlock();
     return false;
 }
 
@@ -158,6 +176,32 @@ SLAudioPlay::SLAudioPlay() {
 
 SLAudioPlay::~SLAudioPlay() {
     delete buf;
+}
+
+void SLAudioPlay::Close() {
+    //todo 为什么要判断*iPlayer？
+    //销毁播放器接口对象
+    mutex1.lock();
+    if (iPlayer && (*iPlayer)) {
+        (*iPlayer)->SetPlayState(iPlayer, SL_PLAYSTATE_STOPPED);
+    }
+    //清理播放队列
+    if (pcmQueue && (*pcmQueue)) {
+        (*pcmQueue)->Clear(pcmQueue);
+    }
+    //销毁播放器对象
+    if (player && (*player)) {
+        (*player)->Destroy(player);
+    }
+    //销毁混音器
+    if (mix && (*mix)) {
+        (*mix)->Destroy(mix);
+    }
+    //销毁播放引擎对象（引擎接口也会跟着销毁）
+    if (objectItf && (*objectItf)) {
+        (*objectItf)->Destroy(objectItf);
+    }
+    mutex1.unlock();
 }
 
 

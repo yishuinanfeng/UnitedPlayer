@@ -15,6 +15,7 @@ public:
     //缓冲满后阻塞
     virtual void Update(XData xData);
     virtual bool StartPlay(XParameter out) = 0;
+    virtual void Close() = 0;
     //获取缓冲数据，如没有则阻塞
     virtual XData GetData();
     int maxFrame = 100;
