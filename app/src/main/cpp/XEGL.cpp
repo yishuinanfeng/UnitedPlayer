@@ -6,36 +6,65 @@
 #include "XEGL.h"
 #include "XLog.h"
 #include <EGL/egl.h>
+#include <mutex>
 
 class CXEGL : public XEGL {
 public:
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface eglSurface = EGL_NO_SURFACE;
     EGLContext eglContext = EGL_NO_CONTEXT;
+    std::mutex mutex;
 
     virtual void Draw() {
+        mutex.lock();
         if (display == EGL_NO_DISPLAY || eglSurface == EGL_NO_SURFACE) {
             return;
         }
         LOGE("CXEGL Draw");
         //将surface显示出来
         eglSwapBuffers(display, eglSurface);
+        mutex.unlock();
+    }
+
+    virtual void Close() {
+        mutex.lock();
+        if (display == EGL_NO_DISPLAY) {
+            mutex.unlock();
+            return;
+        }
+        //display和surface解绑定
+        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        if (eglSurface != EGL_NO_SURFACE) {
+            eglDestroySurface(display, eglSurface);
+        }
+        if (eglContext != EGL_NO_CONTEXT) {
+            eglDestroyContext(display, eglContext);
+        }
+        eglTerminate(display);
+        display = EGL_NO_DISPLAY;
+        eglSurface = EGL_NO_SURFACE;
+        eglContext = EGL_NO_CONTEXT;
+        mutex.unlock();
     }
 
     virtual bool Init(void *win) {
+        Close();
         ANativeWindow *nwin = static_cast<ANativeWindow *>(win);
+        mutex.lock();
         //初始化egl
 
         //1.获取egl display
         display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (display == EGL_NO_DISPLAY) {
             LOGI("eglGetDisplay failed!");
+            mutex.unlock();
             return false;
         }
         LOGI("eglGetDisplay success!");
         //2.初始化display，后两个参数为主次版本号
         if (EGL_TRUE != eglInitialize(display, 0, 0)) {
             LOGI("eglInitialize failed!");
+            mutex.unlock();
             return false;
         }
 
@@ -54,6 +83,7 @@ public:
 
         if (EGL_TRUE != eglChooseConfig(display, configSpec, &eglConfig, 1, &configNum)) {
             LOGD("eglChooseConfig failed");
+            mutex.unlock();
             return false;
         }
 
@@ -63,6 +93,7 @@ public:
         eglSurface = eglCreateWindowSurface(display, eglConfig, nwin, NULL);
         if (eglSurface == EGL_NO_SURFACE) {
             LOGD("eglCreateWindowSurface failed");
+            mutex.unlock();
             return false;
         }
 
@@ -76,18 +107,21 @@ public:
         eglContext = eglCreateContext(display, eglConfig, EGL_NO_CONTEXT, ctxAttr);
         if (eglContext == EGL_NO_CONTEXT) {
             LOGD("eglCreateContext failed");
+            mutex.unlock();
             return false;
         }
 
         LOGD("eglCreateContext success");
         //将egl和opengl关联
-        //两个surface一个读一个写。第二个一般用来离线渲染？
+        //todo 两个surface一个读一个写。第二个一般用来离线渲染？
         if (EGL_TRUE != eglMakeCurrent(display, eglSurface, eglSurface, eglContext)) {
             LOGD("eglMakeCurrent failed");
+            mutex.unlock();
             return false;
         }
 
         LOGD("eglMakeCurrent success");
+        mutex.unlock();
         return true;
     }
 };
