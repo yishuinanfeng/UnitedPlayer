@@ -138,8 +138,11 @@ GLuint initShader(const char *source, GLint type) {
 }
 
 bool XShader::Init(XShaderType shaderType) {
+    Close();
+    mutex.lock();
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
+        mutex.unlock();
         LOGDT("XShader initShader GL_VERTEX_SHADER failed");
         return false;
     }
@@ -155,10 +158,12 @@ bool XShader::Init(XShaderType shaderType) {
             fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
             break;
         default:
+            mutex.unlock();
             LOGDT("XShaderType is error");
             return false;
     }
     if (fsh == 0) {
+        mutex.unlock();
         LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
         return false;
     }
@@ -167,6 +172,7 @@ bool XShader::Init(XShaderType shaderType) {
     //创建渲染程序
     program = glCreateProgram();
     if (program == 0) {
+        mutex.unlock();
         LOGDT("XShader glCreateProgram failed");
         return false;
     }
@@ -180,6 +186,7 @@ bool XShader::Init(XShaderType shaderType) {
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {
+        mutex.unlock();
         LOGDT("XShader glLinkProgram failed");
         return false;
     }
@@ -226,7 +233,7 @@ bool XShader::Init(XShaderType shaderType) {
             break;
 
     }
-
+    mutex.unlock();
     LOGDT("XShader 初始化Shader成功");
     return true;
 }
@@ -246,13 +253,14 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
         //带透明通道，按照亮度和alpha值存储纹理单元
         format = GL_LUMINANCE_ALPHA;
     }
-    if (text[index] == 0) {
-        glGenTextures(1, &text[index]);
+    mutex.lock();
+    if (textures[index] == 0) {
+        glGenTextures(1, &textures[index]);
         //LOGD("XShader GetTexture texture id:%d:",text[index]);
         //绑定纹理。后面的的设置和加载全部作用于当前绑定的纹理对象
         //GL_TEXTURE0、GL_TEXTURE1、GL_TEXTURE2 的就是纹理单元，GL_TEXTURE_1D、GL_TEXTURE_2D、CUBE_MAP为纹理目标
         //通过 glBindTexture 函数将纹理目标和纹理绑定后，对纹理目标所进行的操作都反映到对纹理上
-        glBindTexture(GL_TEXTURE_2D, text[index]);
+        glBindTexture(GL_TEXTURE_2D, textures[index]);
         //缩小的过滤器
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         //放大的过滤器
@@ -277,7 +285,7 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
     //下面的width,height主要是显示尺寸？
     glActiveTexture(GL_TEXTURE0 + index);
     //绑定纹理
-    glBindTexture(GL_TEXTURE_2D, text[index]);
+    glBindTexture(GL_TEXTURE_2D, textures[index]);
     //替换纹理，比重新使用glTexImage2D性能高多
     LOGDT("GetTexture width:%d, height:%d", width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0,
@@ -285,13 +293,40 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
                     width, height,//加载的纹理宽度、高度。最好为2的次幂
                     format, GL_UNSIGNED_BYTE,
                     buf);
+    mutex.unlock();
 }
 
 void XShader::Draw() {
+    mutex.lock();
     if (!program) {
+        mutex.unlock();
         return;
     }
     LOGE("xShader Draw");
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    mutex.unlock();
+}
+
+void XShader::Close() {
+    mutex.lock();
+    //要先释放program，如果先释放shader的话程序还会访问shader，导致出错？
+    if (program) {
+        glDeleteProgram(program);
+    }
+    if (fsh) {
+        glDeleteShader(fsh);
+    }
+    if (vsh) {
+        glDeleteShader(vsh);
+    }
+
+    for (int i = 0; i < sizeof(textures) / sizeof(unsigned int); ++i) {
+        if (textures[i]) {
+            glDeleteTextures(1, &textures[i]);
+        }
+        textures[i] = 0;
+    }
+    mutex.unlock();
+
 }
