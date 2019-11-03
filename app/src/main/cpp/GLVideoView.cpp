@@ -29,3 +29,12 @@ void GLVideoView::SetRender(void *win) {
 //        xTexture->Init(view);
 //    }
 }
+
+void GLVideoView::Close() {
+    mutex1.lock();
+    if (xTexture) {
+        xTexture->Drop();
+        xTexture = nullptr;
+    }
+    mutex1.unlock();
+}

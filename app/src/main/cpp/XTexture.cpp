@@ -11,21 +11,38 @@ class CXTexture : public XTexture {
 public:
     XShader xShader;
     XTextureType type;
+    std::mutex mutex;
+
+    virtual void Drop() {
+        mutex.lock();
+        XEGL::Get()->Close();
+        xShader.Close();
+        mutex.unlock();
+        //todo 相当于调用析构函数？
+        delete this;
+    }
 
     virtual bool Init(void *win, XTextureType textureType) {
+        mutex.lock();
+        XEGL::Get()->Close();
+        xShader.Close();
         this->type = textureType;
         if (!win) {
             LOGE("CXTexture win is NULL！");
         }
         if (!XEGL::Get()->Init(win)) {
+            mutex.unlock();
             return false;
         }
 
         LOGE("Init xShader");
-        return xShader.Init(static_cast<XShaderType>(type));
+        bool isInit = xShader.Init(static_cast<XShaderType>(type));
+        mutex.unlock();
+        return isInit;
     }
 
     virtual void Draw(unsigned char *data[], int width, int height) {
+        mutex.lock();
         xShader.GetTexture(0, width, height, data[0]);//Y
         LOGDT("GetTexture data y:%d:", *data[0]);
         if (type == XTEXTURE_YUV420P) {
@@ -40,9 +57,12 @@ public:
 
         xShader.Draw();
         XEGL::Get()->Draw();
+        mutex.unlock();
     }
 };
 
 XTexture *XTexture::Create() {
     return new CXTexture();
 }
+
+

@@ -10,14 +10,19 @@
 #include "IVideoView.h"
 
 class XTexture;
-class GLVideoView :public IVideoView{
+
+class GLVideoView : public IVideoView {
 public:
     virtual void SetRender(void *win);
+
     virtual void Render(XData xData);
+    //todo 没有调用？？
+    virtual void Close();
 
 protected:
-    void * view = 0;
+    void *view = 0;
     XTexture *xTexture = 0;
+    std::mutex mutex1;
 };
 
 
