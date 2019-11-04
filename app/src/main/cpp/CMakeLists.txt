@@ -9,7 +9,7 @@ include_directories(include)
 
 #设置ffmpeg库所在路径的变量
 set(FF ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
-
+#设置ffmpeg的动态库，在链接的时候使用
 add_library(avcodec SHARED IMPORTED)
 set_target_properties(avcodec PROPERTIES IMPORTED_LOCATION ${FF}/libavcodec.so)
 

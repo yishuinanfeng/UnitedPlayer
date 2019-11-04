@@ -54,3 +54,11 @@ IPlayerProxy *IPlayerProxy::Get() {
 IPlayerProxy::IPlayerProxy() {
 
 }
+
+void IPlayerProxy::Close() {
+    mutex.lock();
+    if (player) {
+        player->Close();
+    }
+    mutex.unlock();
+}

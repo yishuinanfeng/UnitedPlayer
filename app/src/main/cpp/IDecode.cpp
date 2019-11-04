@@ -74,3 +74,14 @@ void IDecode::Main() {
     }
 }
 
+void IDecode::Clear() {
+    packsMutex.lock();
+    while (!packList.empty()) {
+        packList.front().Drop();
+        packList.pop_front();
+    }
+    pts = 0;
+    synPts = 0;
+    packsMutex.unlock();
+}
+

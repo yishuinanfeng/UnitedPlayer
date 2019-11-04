@@ -19,6 +19,8 @@ public:
     virtual bool Open(XParameter xParameter, bool isHard = false) = 0;
 
     virtual void Close() = 0;
+    //清理缓冲队列和一些成员参数
+    virtual void Clear();
 
     //Future模式
     virtual bool SendPacket(XData pkt) = 0;

@@ -126,6 +126,7 @@ XData FFDecode::RecvFrame() {
 }
 
 void FFDecode::Close() {
+    Clear();
     mutex1.lock();
     pts = 0;
     if (avFrame) {

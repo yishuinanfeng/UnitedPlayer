@@ -179,9 +179,10 @@ SLAudioPlay::~SLAudioPlay() {
 }
 
 void SLAudioPlay::Close() {
-    //todo 为什么要判断*iPlayer？
+    Clear();
     //销毁播放器接口对象
     mutex1.lock();
+    //todo 为什么要判断*iPlayer？
     if (iPlayer && (*iPlayer)) {
         (*iPlayer)->SetPlayState(iPlayer, SL_PLAYSTATE_STOPPED);
     }

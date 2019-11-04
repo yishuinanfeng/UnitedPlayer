@@ -30,7 +30,6 @@ bool XThread::Start() {
 //停止线程，通过标志位（不一定成功）
 void XThread::Stop() {
     isExit = true;
-
 }
 
 //入口主函数

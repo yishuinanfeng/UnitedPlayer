@@ -10,18 +10,25 @@
 #include "IObserver.h"
 #include "XParameter.h"
 
-class IAudioPlay : public IObserver{
+class IAudioPlay : public IObserver {
 public:
     //缓冲满后阻塞
     virtual void Update(XData xData);
+
     virtual bool StartPlay(XParameter out) = 0;
+
     virtual void Close() = 0;
+
+    //清理缓冲队列
+    virtual void Clear();
+
     //获取缓冲数据，如没有则阻塞
     virtual XData GetData();
+
     int maxFrame = 100;
     int pst = 0;
 protected:
-    std::list <XData> framelist;
+    std::list<XData> framelist;
     std::mutex frameMutex;
 };
 
