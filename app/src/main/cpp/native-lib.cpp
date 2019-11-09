@@ -10,8 +10,8 @@ extern "C" JNIEXPORT
 jint JNI_OnLoad(JavaVM *vm, void *res) {
     //FFDecode::InitHard(vm);
     IPlayerProxy::Get()->Init(vm);
-    IPlayerProxy::Get()->Open("/sdcard/v1080.mp4");
-    IPlayerProxy::Get()->Start();
+//    IPlayerProxy::Get()->Open("/sdcard/v1080.mp4");
+//    IPlayerProxy::Get()->Start();
     return JNI_VERSION_1_4;
 }
 
@@ -23,10 +23,11 @@ Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobje
     IPlayerProxy::Get()->InitView(win);
 }
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_man_manchesterunitedplayer_MainActivity_startPlay(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_man_manchesterunitedplayer_OpenUrlActivity_open(JNIEnv *env, jobject thiz, jstring url) {
+    // TODO: implement open()
+    const char* openUrl = env->GetStringUTFChars(url,0);
+    IPlayerProxy::Get()->Open(openUrl);
+    IPlayerProxy::Get()->Start();
 }
