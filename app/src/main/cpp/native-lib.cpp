@@ -35,4 +35,9 @@ JNIEXPORT jdouble JNICALL
 Java_com_man_manchesterunitedplayer_MainActivity_getPlayPos(JNIEnv *env, jobject thiz) {
     // TODO: double可以直接返回？
     return IPlayerProxy::Get()->GetPlayPose();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_man_manchesterunitedplayer_MainActivity_seek(JNIEnv *env, jobject thiz, jdouble position) {
+    // TODO: implement seek()
+    IPlayerProxy::Get()->Seek(position);
 }

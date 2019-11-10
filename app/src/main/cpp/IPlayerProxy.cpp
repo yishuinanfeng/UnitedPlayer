@@ -74,3 +74,13 @@ double IPlayerProxy::GetPlayPose() {
     mutex.unlock();
     return pos;
 }
+
+bool IPlayerProxy::Seek(double position) {
+    bool re = false;
+    mutex.lock();
+    if (player){
+        re = player->Seek(position);
+    }
+    mutex.unlock();
+    return re;
+}

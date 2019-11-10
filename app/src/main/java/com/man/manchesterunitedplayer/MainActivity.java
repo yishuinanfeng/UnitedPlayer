@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 
-public class MainActivity extends Activity implements Runnable {
+public class MainActivity extends Activity implements Runnable,SeekBar.OnSeekBarChangeListener {
 
     private SeekBar seekBar;
 
@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements Runnable {
             }
         });
         seekBar = findViewById(R.id.progressBar);
+        seekBar.setOnSeekBarChangeListener(this);
 
         new Thread(this).start();
     }
@@ -44,7 +45,7 @@ public class MainActivity extends Activity implements Runnable {
     @Override
     public void run() {
         for (; ; ) {
-            seekBar.setProgress((int) (getPlayPos() * 100));
+            seekBar.setProgress((int) (getPlayPos() * seekBar.getMax()));
             try {
                 Thread.sleep(40);
             } catch (InterruptedException e) {
@@ -52,5 +53,22 @@ public class MainActivity extends Activity implements Runnable {
             }
         }
     }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        seek((double)seekBar.getProgress()/(double)seekBar.getMax());
+    }
+
+    private native void seek(double position);
 }
 

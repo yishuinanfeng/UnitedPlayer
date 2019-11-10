@@ -162,4 +162,14 @@ double IPlayer::GetPlayPose() {
     return pos;
 }
 
+bool IPlayer::Seek(double position) {
+    bool re = false;
+    mutex.lock();
+    if (iDemux){
+        re = iDemux->Seek(position);
+    }
+    mutex.unlock();
+    return re;
+}
+
 

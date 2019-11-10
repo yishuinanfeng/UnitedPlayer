@@ -25,6 +25,9 @@ public:
 
     virtual double GetPlayPose();
 
+    virtual bool Seek(double position);
+
+
 
 protected:
     IPlayerProxy();

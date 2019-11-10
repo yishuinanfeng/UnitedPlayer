@@ -28,6 +28,8 @@ public:
     //读取一帧数据（注意防止内存泄漏）
     virtual XData Read();
 
+    virtual bool Seek(double position);
+
     FFDemux();
 
 private:

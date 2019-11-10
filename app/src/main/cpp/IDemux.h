@@ -27,8 +27,10 @@ public://
 
     //读取一帧数据（注意防止内存泄漏）
     virtual XData Read() = 0;
+    //seek范围0.0--1.0
+    virtual bool Seek(double position) = 0;
 
-    //总时长（毫秒）
+    //总时长（单位time_base）
     int totalMs = 0;
 
 protected:

@@ -39,6 +39,8 @@ public:
     //获取当前进度（0.0--1.0）
     virtual double GetPlayPose();
 
+    virtual bool Seek(double position);
+
 //protected:
     IDemux *iDemux = 0;
     IDecode *videoDecode = 0;

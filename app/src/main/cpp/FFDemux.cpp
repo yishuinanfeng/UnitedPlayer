@@ -160,4 +160,24 @@ void FFDemux::Close() {
     mux.unlock();
 }
 
+bool FFDemux::Seek(double position) {
+    if (position < 0 || position > 1) {
+        return false;
+    }
+    bool re = false;
+    mux.lock();
+    if (!ic) {
+        mux.unlock();
+        return false;
+    }
+    avformat_flush(ic);
+    long long seekPts = static_cast<long long int>(ic->streams[videoStreamIndex]->duration *
+                                                   position);
+    //AVSEEK_FLAG_BACKWARD： 往靠近视频开始的位置寻找关键帧
+    //AVSEEK_FLAG_FRAME：基于帧查找
+    re = av_seek_frame(ic, videoStreamIndex, seekPts, AVSEEK_FLAG_FRAME | AVSEEK_FLAG_BACKWARD);
+    mux.unlock();
+    return re;
+}
+
 
