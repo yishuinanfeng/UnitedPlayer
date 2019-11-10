@@ -25,6 +25,15 @@ public class OpenUrlActivity extends Activity {
                 finish();
             }
         });
+
+        findViewById(R.id.playrtmp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText editText = findViewById(R.id.rtmpurl);
+                open(editText.getText().toString());
+                finish();
+            }
+        });
     }
 
     private native void open(String url);

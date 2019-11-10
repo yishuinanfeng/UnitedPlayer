@@ -36,6 +36,7 @@ static SLEngineItf CreateSl() {
 
     return engineItf;
 }
+
 /**
  * 获得缓存的解码重采样后的数据，将数据添加到OpenSl的播放队列中
  * @param bufq
@@ -60,7 +61,9 @@ void SLAudioPlay::PlayCall(void *bufq) {
     //保护buf？
     mutex1.lock();
     memcpy(buf, xData.data, static_cast<size_t>(xData.size));
-    (*bufferQueueItf)->Enqueue(bufferQueueItf, buf, static_cast<SLuint32>(xData.size));
+    if (pcmQueue && (*pcmQueue)) {
+        (*bufferQueueItf)->Enqueue(bufferQueueItf, buf, static_cast<SLuint32>(xData.size));
+    }
     mutex1.unlock();
     xData.Drop();
 }
@@ -160,6 +163,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
 
     //设置回调函数，缓冲队列播放完调用PcmCall。
     //第三个参数为回调函数的参数
+    //todo pcmQueue会传入回调函数第一个参数？
     (*pcmQueue)->RegisterCallback(pcmQueue, PcmCall, this);
     //设置为播放状态
     (*iPlayer)->SetPlayState(iPlayer, SL_PLAYSTATE_PLAYING);
@@ -202,6 +206,17 @@ void SLAudioPlay::Close() {
     if (objectItf && (*objectItf)) {
         (*objectItf)->Destroy(objectItf);
     }
+
+    //static表示只在本cpp文件有效
+    objectItf = NULL;
+    eng = NULL;
+    mix = NULL;
+//播放器对象
+    player = NULL;
+//播放器接口
+    iPlayer = NULL;
+    //todo pcmQueue要置为NULL，不然被清理了但是还会继续在音频回调函数中执行导致产生异常
+    pcmQueue = NULL;
     mutex1.unlock();
 }
 
