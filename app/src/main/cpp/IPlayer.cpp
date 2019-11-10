@@ -146,4 +146,20 @@ void IPlayer::Close() {
     mutex.unlock();
 }
 
+double IPlayer::GetPlayPose() {
+    double pos = 0.0;
+    mutex.lock();
+    int total = 0;
+    if (iDemux){
+        total = iDemux->totalMs;
+    }
+    if (total > 0){
+        if (videoDecode){
+            pos = (double)videoDecode->pts/(double)total;
+        }
+    }
+    mutex.unlock();
+    return pos;
+}
+
 

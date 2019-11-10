@@ -20,6 +20,8 @@ bool IPlayerProxy::Open(const char *path) {
     bool result = false;
     mutex.lock();
     if (player) {
+        //todo 防止外部程序修改了isHardDecode无效
+        player->isHardDecode = isHardDecode;
         result = player->Open(path);
     }
     mutex.unlock();
@@ -61,4 +63,14 @@ void IPlayerProxy::Close() {
         player->Close();
     }
     mutex.unlock();
+}
+
+double IPlayerProxy::GetPlayPose() {
+    double pos = 0.0;
+    mutex.lock();
+    if (player) {
+        pos = player->GetPlayPose();
+    }
+    mutex.unlock();
+    return pos;
 }

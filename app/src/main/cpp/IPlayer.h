@@ -36,6 +36,8 @@ public:
     virtual bool Start();
 
     virtual bool InitView(void *win);
+    //获取当前进度（0.0--1.0）
+    virtual double GetPlayPose();
 
 //protected:
     IDemux *iDemux = 0;

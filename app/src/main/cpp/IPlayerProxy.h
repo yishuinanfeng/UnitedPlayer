@@ -23,6 +23,9 @@ public:
 
     virtual bool InitView(void *win);
 
+    virtual double GetPlayPose();
+
+
 protected:
     IPlayerProxy();
 

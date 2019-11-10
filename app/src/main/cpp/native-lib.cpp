@@ -27,7 +27,12 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_OpenUrlActivity_open(JNIEnv *env, jobject thiz, jstring url) {
     // TODO: implement open()
-    const char* openUrl = env->GetStringUTFChars(url,0);
+    const char *openUrl = env->GetStringUTFChars(url, 0);
     IPlayerProxy::Get()->Open(openUrl);
     IPlayerProxy::Get()->Start();
+}extern "C"
+JNIEXPORT jdouble JNICALL
+Java_com_man_manchesterunitedplayer_MainActivity_getPlayPos(JNIEnv *env, jobject thiz) {
+    // TODO: double可以直接返回？
+    return IPlayerProxy::Get()->GetPlayPose();
 }

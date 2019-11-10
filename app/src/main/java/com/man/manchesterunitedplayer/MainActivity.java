@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements Runnable {
+
+    private SeekBar seekBar;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -31,6 +34,23 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             }
         });
+        seekBar = findViewById(R.id.progressBar);
+
+        new Thread(this).start();
+    }
+
+    private native double getPlayPos();
+
+    @Override
+    public void run() {
+        for (; ; ) {
+            seekBar.setProgress((int) (getPlayPos() * 100));
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 
