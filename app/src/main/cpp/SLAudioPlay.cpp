@@ -170,6 +170,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     //加入空字符串启动队列回调
     (*pcmQueue)->Enqueue(pcmQueue, "", 1);
     LOGA("StartPlay success!");
+    isExit = false;
     mutex1.unlock();
     return false;
 }

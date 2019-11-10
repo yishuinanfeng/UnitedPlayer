@@ -31,6 +31,14 @@ bool XThread::Start() {
 //停止线程，通过标志位（不一定成功）
 void XThread::Stop() {
     isExit = true;
+    //200毫秒的退出超时时间
+    for (int i = 0; i < 200; ++i) {
+        if (!isRunnig){
+            return;
+        }
+        Sleep(1);
+    }
+    LOGD("stop线程超时！");
 }
 
 //入口主函数

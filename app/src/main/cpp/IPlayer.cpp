@@ -115,6 +115,10 @@ void IPlayer::Close() {
     if (audioDecode) {
         audioDecode->Stop();
     }
+
+    if (audioPlay) {
+        audioPlay->Stop();
+    }
     //清理缓冲队列
     if (audioDecode) {
         audioDecode->Clear();
@@ -150,12 +154,12 @@ double IPlayer::GetPlayPose() {
     double pos = 0.0;
     mutex.lock();
     int total = 0;
-    if (iDemux){
+    if (iDemux) {
         total = iDemux->totalMs;
     }
-    if (total > 0){
-        if (videoDecode){
-            pos = (double)videoDecode->pts/(double)total;
+    if (total > 0) {
+        if (videoDecode) {
+            pos = (double) videoDecode->pts / (double) total;
         }
     }
     mutex.unlock();
@@ -165,7 +169,7 @@ double IPlayer::GetPlayPose() {
 bool IPlayer::Seek(double position) {
     bool re = false;
     mutex.lock();
-    if (iDemux){
+    if (iDemux) {
         re = iDemux->Seek(position);
     }
     mutex.unlock();
@@ -175,16 +179,16 @@ bool IPlayer::Seek(double position) {
 void IPlayer::SetPause(bool isP) {
     mutex.lock();
     XThread::SetPause(isP);
-    if (iDemux){
+    if (iDemux) {
         iDemux->SetPause(isP);
     }
-    if (videoDecode){
+    if (videoDecode) {
         videoDecode->SetPause(isP);
     }
-    if (audioDecode){
+    if (audioDecode) {
         audioDecode->SetPause(isP);
     }
-    if (audioPlay){
+    if (audioPlay) {
         audioPlay->SetPause(isP);
     }
     mutex.unlock();

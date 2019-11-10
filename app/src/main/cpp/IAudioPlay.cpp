@@ -28,6 +28,7 @@ void IAudioPlay::Update(XData xData) {
 XData IAudioPlay::GetData() {
     XData data;
     //todo
+    isRunnig = true;
     while (!isExit) {
 
         if (IsPause()){
@@ -48,6 +49,7 @@ XData IAudioPlay::GetData() {
         Sleep(1);
     }
     //未获取到数据
+    isRunnig = false;
     return data;
 }
 

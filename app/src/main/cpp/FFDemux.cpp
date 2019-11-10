@@ -106,14 +106,15 @@ XData FFDemux::Read() {
     mux.lock();
     XData data;
     if (!ic) {
+        mux.unlock();
         return XData();
     }
     AVPacket *pkt = av_packet_alloc();
     //从流中读取一帧，读入传入的AVPacket中
     int re = av_read_frame(ic, pkt);
     if (re != 0) {
-        av_packet_free(&pkt);
         mux.unlock();
+        av_packet_free(&pkt);
         return XData();
     }
     LOGI("packet size:%d pts:%lld", pkt->size, pkt->pts);
@@ -125,8 +126,8 @@ XData FFDemux::Read() {
     } else if (pkt->stream_index == audioStreamIndex) {
         data.isAudio = true;
     } else {
-        av_packet_free(&pkt);
         mux.unlock();
+        av_packet_free(&pkt);
         return XData();
     }
     //time_base单位为秒，这里转为毫秒
