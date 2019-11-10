@@ -32,6 +32,11 @@ void IDecode::Update(XData pkt) {
  */
 void IDecode::Main() {
     while (!isExit) {
+        if (IsPause()){
+            Sleep(2);
+            continue;
+        }
+
         packsMutex.lock();
 
         //音视频同步

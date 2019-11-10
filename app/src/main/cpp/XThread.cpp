@@ -21,6 +21,7 @@ void Sleep(int mis) {
 bool XThread::Start() {
     //创建线程
     isExit = false;
+    isPause = false;
     thread th(&XThread::ThreadMain, this);
     //当前线程成为守护线程
     th.detach();
@@ -39,4 +40,21 @@ void XThread::ThreadMain() {
     Main();
     LOGI("线程函数退出");
     isRunnig = false;
+}
+
+void XThread::SetPause(bool pause) {
+    isPause = pause;
+    //等待isPausing的变化，最多等待100毫秒
+//    for (int i = 0; i < 10; i++) {
+//        if (isPausing == isPause) {
+//            break;
+//        }
+//        Sleep(10);
+//    }
+
+}
+
+bool XThread::IsPause() {
+ //   isPausing = isPause;
+    return isPause;
 }

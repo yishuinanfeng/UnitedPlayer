@@ -29,6 +29,12 @@ XData IAudioPlay::GetData() {
     XData data;
     //todo
     while (!isExit) {
+
+        if (IsPause()){
+            Sleep(2);
+            continue;
+        }
+
         frameMutex.lock();
         if (!framelist.empty()) {
             data = framelist.front();

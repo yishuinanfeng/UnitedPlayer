@@ -27,6 +27,9 @@ public:
 
     virtual bool Seek(double position);
 
+    virtual void SetPause(bool isP);
+
+    virtual bool IsPause();
 
 
 protected:

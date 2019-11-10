@@ -16,12 +16,18 @@ public:
     //停止线程，通过标志位（不一定成功）
     virtual void Stop();
 
+    virtual void SetPause(bool isPause);
+
     //入口主函数
     virtual void Main() {}
+
+    virtual bool IsPause();
 
 protected:
     bool isExit = false;
     bool isRunnig = false;
+    bool isPause = false;
+    bool isPausing = false;
 private:
     void ThreadMain();
 };

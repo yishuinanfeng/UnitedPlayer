@@ -40,4 +40,9 @@ JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_MainActivity_seek(JNIEnv *env, jobject thiz, jdouble position) {
     // TODO: implement seek()
     IPlayerProxy::Get()->Seek(position);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_man_manchesterunitedplayer_ManchesterPlayer_pausePlay(JNIEnv *env, jobject thiz) {
+    // TODO: implement pausePlay()
+    IPlayerProxy::Get()->SetPause(!IPlayerProxy::Get()->IsPause());
 }

@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -13,7 +14,7 @@ import javax.microedition.khronos.opengles.GL10;
  * 播放控件
  * SurfaceHolder.Callback作用是通知代码窗口的状态
  */
-public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer {
+public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer, View.OnClickListener {
     private static final String TAG = ManchesterPlayer.class.getSimpleName();
 
     public ManchesterPlayer(Context context) {
@@ -23,6 +24,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     public ManchesterPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
         setRenderer(this);
+        setOnClickListener(this);
     }
 
     @Override
@@ -57,4 +59,12 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     public void onDrawFrame(GL10 gl10) {
         Log.d(TAG,"Renderer onDrawFrame");
     }
+
+    @Override
+    public void onClick(View view) {
+        pausePlay();
+    }
+
+    private native void pausePlay();
+
 }

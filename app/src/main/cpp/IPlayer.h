@@ -36,10 +36,13 @@ public:
     virtual bool Start();
 
     virtual bool InitView(void *win);
+
     //获取当前进度（0.0--1.0）
     virtual double GetPlayPose();
 
     virtual bool Seek(double position);
+
+    virtual void SetPause(bool isP);
 
 //protected:
     IDemux *iDemux = 0;
@@ -56,7 +59,9 @@ public:
 protected:
     //用作音视频同步
     void Main();
+
     std::mutex mutex;
+
     IPlayer();
 };
 

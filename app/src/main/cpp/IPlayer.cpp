@@ -172,4 +172,22 @@ bool IPlayer::Seek(double position) {
     return re;
 }
 
+void IPlayer::SetPause(bool isP) {
+    mutex.lock();
+    XThread::SetPause(isP);
+    if (iDemux){
+        iDemux->SetPause(isP);
+    }
+    if (videoDecode){
+        videoDecode->SetPause(isP);
+    }
+    if (audioDecode){
+        audioDecode->SetPause(isP);
+    }
+    if (audioPlay){
+        audioPlay->SetPause(isP);
+    }
+    mutex.unlock();
+}
+
 

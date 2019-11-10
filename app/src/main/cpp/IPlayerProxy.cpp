@@ -84,3 +84,21 @@ bool IPlayerProxy::Seek(double position) {
     mutex.unlock();
     return re;
 }
+
+void IPlayerProxy::SetPause(bool isP) {
+    mutex.lock();
+    if (player){
+        player->SetPause(isP);
+    }
+    mutex.unlock();
+}
+
+bool IPlayerProxy::IsPause() {
+    bool re = false;
+    mutex.lock();
+    if (player){
+        re = player->IsPause();
+    }
+    mutex.unlock();
+    return re;
+}
