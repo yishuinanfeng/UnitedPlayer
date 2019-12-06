@@ -140,5 +140,16 @@ void FFDecode::Close() {
     mutex1.unlock();
 }
 
+void FFDecode::Clear() {
+    IDecode::Clear();
+    mutex1.lock();
+    if (codecContext){
+        //清空ffmpeg内部的解码缓冲队列
+        avcodec_flush_buffers(codecContext);
+    }
+    mutex1.unlock();
+
+}
+
 
 

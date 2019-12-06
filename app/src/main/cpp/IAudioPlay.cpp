@@ -2,6 +2,7 @@
 // Created by yanxi on 2019/10/20.
 //
 
+#include <thread>
 #include "IAudioPlay.h"
 #include "XLog.h"
 
@@ -31,10 +32,12 @@ XData IAudioPlay::GetData() {
     isRunnig = true;
     while (!isExit) {
 
-        if (IsPause()){
-            Sleep(2);
-            continue;
-        }
+//        if (IsPause()) {
+//            Sleep(2);
+//            std::thread::id tid = std::this_thread::get_id();
+//            LOGD("IAudioPlay GetData thread::id:%d", tid);
+//            continue;
+//        }
 
         frameMutex.lock();
         if (!framelist.empty()) {

@@ -165,7 +165,7 @@ bool FFDemux::Seek(double position) {
     if (position < 0 || position > 1) {
         return false;
     }
-    bool re = false;
+    bool re;
     mux.lock();
     if (!ic) {
         mux.unlock();

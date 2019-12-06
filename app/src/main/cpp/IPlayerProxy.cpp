@@ -6,45 +6,45 @@
 #include "FFPlayBuilder.h"
 
 void IPlayerProxy::Init(void *vm) {
-    mutex.lock();
+    mutexProxy.lock();
     if (vm) {
         FFPlayBuilder::InitHard(vm);
     }
     if (!player) {
         player = FFPlayBuilder::Get()->BuildPlayer();
     }
-    mutex.unlock();
+    mutexProxy.unlock();
 }
 
 bool IPlayerProxy::Open(const char *path) {
     bool result = false;
-    mutex.lock();
+    mutexProxy.lock();
     if (player) {
         //todo 防止外部程序修改了isHardDecode无效
         player->isHardDecode = isHardDecode;
         result = player->Open(path);
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return result;
 }
 
 bool IPlayerProxy::Start() {
     bool result = false;
-    mutex.lock();
+    mutexProxy.lock();
     if (player) {
         result = player->Start();
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return result;
 }
 
 bool IPlayerProxy::InitView(void *win) {
     bool result = false;
-    mutex.lock();
+    mutexProxy.lock();
     if (player) {
         result = player->InitView(win);
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return result;
 }
 
@@ -58,47 +58,47 @@ IPlayerProxy::IPlayerProxy() {
 }
 
 void IPlayerProxy::Close() {
-    mutex.lock();
+    mutexProxy.lock();
     if (player) {
         player->Close();
     }
-    mutex.unlock();
+    mutexProxy.unlock();
 }
 
 double IPlayerProxy::GetPlayPose() {
     double pos = 0.0;
-    mutex.lock();
+    mutexProxy.lock();
     if (player) {
         pos = player->GetPlayPose();
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return pos;
 }
 
 bool IPlayerProxy::Seek(double position) {
     bool re = false;
-    mutex.lock();
+    mutexProxy.lock();
     if (player){
         re = player->Seek(position);
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return re;
 }
 
 void IPlayerProxy::SetPause(bool isP) {
-    mutex.lock();
+    mutexProxy.lock();
     if (player){
         player->SetPause(isP);
     }
-    mutex.unlock();
+    mutexProxy.unlock();
 }
 
 bool IPlayerProxy::IsPause() {
     bool re = false;
-    mutex.lock();
+    mutexProxy.lock();
     if (player){
         re = player->IsPause();
     }
-    mutex.unlock();
+    mutexProxy.unlock();
     return re;
 }

@@ -36,7 +36,7 @@ protected:
     IPlayerProxy();
 
     IPlayer *player = 0;
-    std::mutex mutex;
+    std::mutex mutexProxy;
 
 };
 

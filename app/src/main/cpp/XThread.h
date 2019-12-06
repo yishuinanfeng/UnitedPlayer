@@ -23,6 +23,7 @@ public:
 
     virtual bool IsPause();
 
+
 protected:
     bool isExit = false;
     bool isRunnig = false;
