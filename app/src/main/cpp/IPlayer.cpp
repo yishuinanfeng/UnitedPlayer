@@ -176,31 +176,35 @@ bool IPlayer::Seek(double position) {
     bool re;
     //seek之前暂停所有的线程
     SetPause(true);
-    LOGD("seek debug:Seek start");
+    LOGS("seek debug:Seek start");
 
     mutex.lock();
     //清理各个模块缓冲队列
+    LOGS("mutex.lock()");
     if (audioDecode) {
         audioDecode->Clear();
     }
+    LOGS("audioDecode->Clear()");
     if (videoDecode) {
         videoDecode->Clear();
     }
+    LOGS("videoDecode->Clear()");
     if (audioPlay) {
         audioPlay->Clear();
     }
-
+    LOGS("audioPlay->Clear()");
     re = iDemux->Seek(position);
+    LOGS("iDemux->Seek end");
     //假如没有视频，则函数返回
-//    if (!videoDecode) {
-//        mutexProxy.unlock();
-//        //seek之后重新开启所有的线程
-//        SetPause(false);
-//        return re;
-//    }
+    if (!videoDecode) {
+        mutex.unlock();
+        //seek之后重新开启所有的线程
+        SetPause(false);
+        return re;
+    }
 
     //在position时间点之前的帧都丢弃，从实际需要显示的帧开始
-    int seekPts = position * iDemux->totalMs;
+//    int seekPts = position * iDemux->totalMs;
 //    while (!isExit) {
 //        XData pkt = iDemux->Read();
 //        if (pkt.size <= 0) {
@@ -226,14 +230,14 @@ bool IPlayer::Seek(double position) {
 //        }
 //
 //        if (data.pts >= seekPts) {
-//          //  videoDecode->notify(data);
+//            videoDecode->notify(data);
 //            break;
 //        }
 //
 //    }
 
     mutex.unlock();
-    LOGD("seek debug:Seek end");
+    LOGS("seek debug:Seek end");
     //seek之后重新开启所有的线程
     SetPause(false);
     return re;
@@ -252,6 +256,7 @@ void IPlayer::SetPause(bool isP) {
         audioDecode->SetPause(isP);
     }
     if (audioPlay) {
+        LOGS("audioPlay->SetPause:");
         audioPlay->SetPause(isP);
     }
     mutex.unlock();

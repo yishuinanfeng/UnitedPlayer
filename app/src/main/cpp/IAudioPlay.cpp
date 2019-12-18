@@ -32,12 +32,13 @@ XData IAudioPlay::GetData() {
     isRunnig = true;
     while (!isExit) {
 
-//        if (IsPause()) {
-//            Sleep(2);
-//            std::thread::id tid = std::this_thread::get_id();
-//            LOGD("IAudioPlay GetData thread::id:%d", tid);
-//            continue;
-//        }
+        if (IsPause()) {
+            Sleep(2);
+            LOGE("IAudioPlay::GetData Pause");
+            continue;
+        }
+
+        LOGE("IAudioPlay::GetData resume");
 
         frameMutex.lock();
         if (!framelist.empty()) {

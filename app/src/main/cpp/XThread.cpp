@@ -53,16 +53,16 @@ void XThread::ThreadMain() {
 void XThread::SetPause(bool pause) {
     isPause = pause;
     //等待isPausing的变化，最多等待100毫秒
-    for (int i = 0; i < 10; i++) {
-        if (isPausing == isPause) {
-            break;
-        }
-        Sleep(10);
-    }
+//    for (int i = 0; i < 10; i++) {
+//        if (isPausing == isPause) {
+//            break;
+//        }
+//        Sleep(10);
+//    }
 
 }
 
 bool XThread::IsPause() {
-    isPausing = isPause;
+    //isPause;
     return isPause;
 }
