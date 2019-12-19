@@ -98,6 +98,10 @@ void IDecode::Main() {
 
                     pts = frame.pts;
 
+                    if (!frame.isAudio){
+                        //大概以每秒25帧播放
+                        Sleep(40);
+                    }
                     notify(frame);
 
                     LOGLOCK("notify(frame)");

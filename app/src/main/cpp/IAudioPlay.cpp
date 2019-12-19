@@ -23,7 +23,7 @@ void IAudioPlay::Update(XData xData) {
             LOGLOCK("IAudioPlay Update packsMutex.unlock()1");
             Sleep(1);
             //这里如果死暂停则跳出循环，否则会导致IDecode发生死锁！！！！！
-            if (!IsPause()) {
+            if (IsPause()) {
                 break;
             }
             continue;
