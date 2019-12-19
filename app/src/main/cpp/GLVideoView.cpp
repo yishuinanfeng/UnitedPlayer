@@ -13,7 +13,7 @@ void GLVideoView::Render(XData xData) {
     }
     if (!xTexture) {
         xTexture = XTexture::Create();
-        xTexture->Init(view, static_cast<XTextureType>(xData.format));
+        xTexture-> Init(view, static_cast<XTextureType>(xData.format));
     }
     xTexture->Draw(xData.datas, xData.width, xData.height);
     LOGE("Render end");
@@ -31,10 +31,11 @@ void GLVideoView::SetRender(void *win) {
 }
 
 void GLVideoView::Close() {
-    mutex1.lock();
+  //  mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
     if (xTexture) {
         xTexture->Drop();
         xTexture = nullptr;
     }
-    mutex1.unlock();
+ //   mutex1.unlock();
 }

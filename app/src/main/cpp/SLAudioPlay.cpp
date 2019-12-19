@@ -59,12 +59,14 @@ void SLAudioPlay::PlayCall(void *bufq) {
     }
     LOGA("PlayCall Enqueue");
     //保护buf？
-    mutex1.lock();
+  //  mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
+
     memcpy(buf, xData.data, static_cast<size_t>(xData.size));
     if (pcmQueue && (*pcmQueue)) {
         (*bufferQueueItf)->Enqueue(bufferQueueItf, buf, static_cast<SLuint32>(xData.size));
     }
-    mutex1.unlock();
+  //  mutex1.unlock();
     xData.Drop();
 }
 
@@ -82,13 +84,14 @@ static void PcmCall(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *contex) 
 bool SLAudioPlay::StartPlay(XParameter out) {
     Close();
     //创建引擎
-    mutex1.lock();
+  //  mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
     eng = CreateSl();
     if (eng) {
         LOGA("CreateSL success");
     } else {
         LOGA("CreateSL fail");
-        mutex1.unlock();
+    //    mutex1.unlock();
         return false;
     }
 
@@ -97,14 +100,14 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     sLresult = (*eng)->CreateOutputMix(eng, &mix, 0, 0, 0);
     if (sLresult != SL_RESULT_SUCCESS) {
         LOGA("CreateOutputMix fail");
-        mutex1.unlock();
+      //  mutex1.unlock();
         return false;
     }
 
     sLresult = (*mix)->Realize(mix, SL_BOOLEAN_FALSE);
     if (sLresult != SL_RESULT_SUCCESS) {
         LOGA("mix Realize fail");
-        mutex1.unlock();
+   //     mutex1.unlock();
         return false;
     }
 
@@ -138,7 +141,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("CreateAudioPlayer success");
     } else {
         LOGA("CreateAudioPlayer fail");
-        mutex1.unlock();
+    //    mutex1.unlock();
         return false;
     }
 
@@ -148,7 +151,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("GetInterface SL_IID_PLAY success");
     } else {
         LOGA("GetInterface SL_IID_PLAY fail");
-        mutex1.unlock();
+    //    mutex1.unlock();
         return false;
     }
     //获得缓冲队列接口
@@ -157,7 +160,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
         LOGA("Create SL_IID_BUFFERQUEUE success");
     } else {
         LOGA("Create SL_IID_BUFFERQUEUE fail");
-        mutex1.unlock();
+   //     mutex1.unlock();
         return false;
     }
 
@@ -171,7 +174,7 @@ bool SLAudioPlay::StartPlay(XParameter out) {
     (*pcmQueue)->Enqueue(pcmQueue, "", 1);
     LOGA("StartPlay success!");
     isExit = false;
-    mutex1.unlock();
+  //  mutex1.unlock();
     return false;
 }
 
@@ -186,7 +189,8 @@ SLAudioPlay::~SLAudioPlay() {
 void SLAudioPlay::Close() {
     Clear();
     //销毁播放器接口对象
-    mutex1.lock();
+  //  mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
     //todo 为什么要判断*iPlayer？
     if (iPlayer && (*iPlayer)) {
         (*iPlayer)->SetPlayState(iPlayer, SL_PLAYSTATE_STOPPED);
@@ -218,7 +222,7 @@ void SLAudioPlay::Close() {
     iPlayer = NULL;
     //todo pcmQueue要置为NULL，不然被清理了但是还会继续在音频回调函数中执行导致产生异常
     pcmQueue = NULL;
-    mutex1.unlock();
+ //   mutex1.unlock();
 }
 
 

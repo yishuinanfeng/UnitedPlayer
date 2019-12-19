@@ -14,16 +14,18 @@ public:
     std::mutex mutex;
 
     virtual void Drop() {
-        mutex.lock();
+      //  mutex.lock();
+        const std::lock_guard<std::mutex> lock(mutex);
         XEGL::Get()->Close();
         xShader.Close();
-        mutex.unlock();
+     //   mutex.unlock();
         //todo 相当于调用析构函数？
         delete this;
     }
 
     virtual bool Init(void *win, XTextureType textureType) {
-        mutex.lock();
+    //    mutex.lock();
+        const std::lock_guard<std::mutex> lock(mutex);
         XEGL::Get()->Close();
         xShader.Close();
         this->type = textureType;
@@ -31,18 +33,19 @@ public:
             LOGE("CXTexture win is NULL！");
         }
         if (!XEGL::Get()->Init(win)) {
-            mutex.unlock();
+       //     mutex.unlock();
             return false;
         }
 
         LOGE("Init xShader");
         bool isInit = xShader.Init(static_cast<XShaderType>(type));
-        mutex.unlock();
+    //    mutex.unlock();
         return isInit;
     }
 
     virtual void Draw(unsigned char *data[], int width, int height) {
-        mutex.lock();
+     //   mutex.lock();
+        const std::lock_guard<std::mutex> lock(mutex);
         xShader.GetTexture(0, width, height, data[0]);//Y
         LOGDT("GetTexture data y:%d:", *data[0]);
         if (type == XTEXTURE_YUV420P) {
@@ -57,7 +60,7 @@ public:
 
         xShader.Draw();
         XEGL::Get()->Draw();
-        mutex.unlock();
+   //     mutex.unlock();
     }
 };
 

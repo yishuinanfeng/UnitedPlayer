@@ -28,6 +28,7 @@ class XLog {
 #define LOGA(...) ""
 #define LOGS(...) ""
 #define LOGLOCK(...) __android_log_print(ANDROID_LOG_ERROR,"lock debug",__VA_ARGS__)
+//#define LOGLOCK(...) ""
 #else
 
 #endif

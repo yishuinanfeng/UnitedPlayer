@@ -13,7 +13,8 @@ extern "C" {
 
 bool FFResample::Open(XParameter in, XParameter out) {
     Close();
-    mutex1.lock();
+  //  mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
     swrContext = swr_alloc();
     AVCodecParameters *p = in.parameters;
     //参数前一部分是输出，后一部分是输入
@@ -27,13 +28,13 @@ bool FFResample::Open(XParameter in, XParameter out) {
     int re = swr_init(swrContext);
     if (re != 0) {
         LOGE("swr init fail");
-        mutex1.unlock();
+   //     mutex1.unlock();
         return false;
     }
     LOGD("swr init success");
     outChannels = p->channels;
     outFormat = AV_SAMPLE_FMT_S16;
-    mutex1.unlock();
+  //  mutex1.unlock();
     return true;
 }
 
@@ -42,9 +43,14 @@ XData FFResample::Resample(XData xData) {
     if (xData.size <= 0 || !xData.data) {
         return XData();
     }
-    mutex1.lock();
+  //  mutex1.lock();
+    LOGLOCK("Resample lock() start");
+    const std::lock_guard<std::mutex> lock(mutex1);
+    LOGLOCK("Resample lock() end");
+
     if (!swrContext) {
-        mutex1.unlock();
+     //   mutex1.unlock();
+        LOGLOCK("Resample unlock()1");
         return XData();
     }
     //将data转化为一个AVFrame（一帧）
@@ -54,7 +60,8 @@ XData FFResample::Resample(XData xData) {
     int outSize = outChannels * frame->nb_samples * av_get_bytes_per_sample(
             static_cast<AVSampleFormat>(outFormat));
     if (outSize <= 0) {
-        mutex1.unlock();
+     //   mutex1.unlock();
+        LOGLOCK("Resample unlock()2");
         return XData();
     }
     out.Alloc(outSize);
@@ -68,19 +75,22 @@ XData FFResample::Resample(XData xData) {
                           (const uint8_t **) (frame->data), frame->nb_samples);
     if (len <= 0) {
         out.Drop();
-        mutex1.unlock();
+     //   mutex1.unlock();
         return XData();
     }
     out.pts = xData.pts;
     //   LOGD("Resample success：%d", outSize);
-    mutex1.unlock();
+//    mutex1.unlock();
+    LOGLOCK("Resample unlock()3");
     return out;
 }
 
 void FFResample::Close() {
-    mutex1.lock();
+ //   mutex1.lock();
+    const std::lock_guard<std::mutex> lock(mutex1);
+
     if (swrContext) {
         swr_free(&swrContext);
     }
-    mutex1.unlock();
+ //   mutex1.unlock();
 }

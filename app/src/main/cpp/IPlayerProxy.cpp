@@ -6,45 +6,49 @@
 #include "FFPlayBuilder.h"
 
 void IPlayerProxy::Init(void *vm) {
-    mutexProxy.lock();
+    //mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (vm) {
         FFPlayBuilder::InitHard(vm);
     }
     if (!player) {
         player = FFPlayBuilder::Get()->BuildPlayer();
     }
-    mutexProxy.unlock();
+  //  mutexProxy.unlock();
 }
 
 bool IPlayerProxy::Open(const char *path) {
     bool result = false;
-    mutexProxy.lock();
+ //   mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
         //todo 防止外部程序修改了isHardDecode无效
         player->isHardDecode = isHardDecode;
         result = player->Open(path);
     }
-    mutexProxy.unlock();
+  //  mutexProxy.unlock();
     return result;
 }
 
 bool IPlayerProxy::Start() {
     bool result = false;
-    mutexProxy.lock();
+  //  mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
         result = player->Start();
     }
-    mutexProxy.unlock();
+ //   mutexProxy.unlock();
     return result;
 }
 
 bool IPlayerProxy::InitView(void *win) {
     bool result = false;
-    mutexProxy.lock();
+  //  mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
         result = player->InitView(win);
     }
-    mutexProxy.unlock();
+ //   mutexProxy.unlock();
     return result;
 }
 
@@ -58,47 +62,52 @@ IPlayerProxy::IPlayerProxy() {
 }
 
 void IPlayerProxy::Close() {
-    mutexProxy.lock();
+  //  mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
         player->Close();
     }
-    mutexProxy.unlock();
+  //  mutexProxy.unlock();
 }
 
 double IPlayerProxy::GetPlayPose() {
     double pos = 0.0;
-    mutexProxy.lock();
+ //   mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
         pos = player->GetPlayPose();
     }
-    mutexProxy.unlock();
+  //  mutexProxy.unlock();
     return pos;
 }
 
 bool IPlayerProxy::Seek(double position) {
     bool re = false;
-    mutexProxy.lock();
+  //  mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player){
         re = player->Seek(position);
     }
-    mutexProxy.unlock();
+ //   mutexProxy.unlock();
     return re;
 }
 
 void IPlayerProxy::SetPause(bool isP) {
-    mutexProxy.lock();
+ //   mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player){
         player->SetPause(isP);
     }
-    mutexProxy.unlock();
+ //   mutexProxy.unlock();
 }
 
 bool IPlayerProxy::IsPause() {
     bool re = false;
-    mutexProxy.lock();
+  //  mutexProxy.lock();
+    const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player){
         re = player->IsPause();
     }
-    mutexProxy.unlock();
+//    mutexProxy.unlock();
     return re;
 }

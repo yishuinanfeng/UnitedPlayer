@@ -18,11 +18,13 @@ IPlayer *IPlayer::Get(unsigned int index) {
 
 bool IPlayer::Open(const char *path) {
     Close();
-    mutex.lock();
+   // mutex.lock();
+    const std::lock_guard<std::mutex> lock(mutex);
+
     if (!iDemux || !iDemux->Open(path)) {
         LOGE("demux open %s fail", path);
         //return都要unlock
-        mutex.unlock();
+    //    mutex.unlock();
         return false;
     }
     //下面这几个之所以没有return false，是因为可能是不需要解码或重采样的原始数据
@@ -39,7 +41,7 @@ bool IPlayer::Open(const char *path) {
     if (!resample || !resample->Open(iDemux->GetAudioParameter(), outPara)) {
         LOGE("resample open %s fail", path);
     }
-    mutex.unlock();
+ //   mutex.unlock();
     return true;
 }
 
@@ -48,7 +50,9 @@ bool IPlayer::Start() {
     //    iDemux->Start();
 //    audioDecode->Start();
 //    videoDecode->Start();
-    mutex.lock();
+  //  mutex.lock();
+    const std::lock_guard<std::mutex> lock(mutex);
+
     if (audioPlay) {
         audioPlay->StartPlay(outPara);
     }
@@ -62,12 +66,12 @@ bool IPlayer::Start() {
     if (!iDemux || !iDemux->Start()) {
         LOGE("iDemux->Start fail");
         //return都要unlock
-        mutex.unlock();
+     //   mutex.unlock();
         return false;
     }
 
     XThread::Start();
-    mutex.unlock();
+  //  mutex.unlock();
     return true;
 }
 
@@ -85,24 +89,28 @@ bool IPlayer::InitView(void *win) {
 
 void IPlayer::Main() {
     while (!isExit) {
-        mutex.lock();
+     //   mutex.lock();
+        const std::lock_guard<std::mutex> lock(mutex);
+
         //在player中将当前音频player的当前帧的pts赋值给视频解码器
         if (!audioPlay || !videoDecode) {
-            mutex.unlock();
+       //     mutex.unlock();
             continue;
         }
         //将当前音频帧pts赋值给视频解码器的synPts
         int apts = audioPlay->pst;
         videoDecode->synPts = apts;
         LOGD("apts = %d", apts);
-        mutex.unlock();
+   //     mutex.unlock();
         Sleep(2);
     }
 
 }
 
 void IPlayer::Close() {
-    mutex.lock();
+  //  mutex.lock();
+    const std::lock_guard<std::mutex> lock(mutex);
+
     //停止线程
     //同步线程
     XThread::Stop();
@@ -147,13 +155,15 @@ void IPlayer::Close() {
         iDemux->Close();
     }
 
-    mutex.unlock();
+ //   mutex.unlock();
 }
 
 double IPlayer::GetPlayPose() {
     double pos = 0.0;
     LOGD("seek debug:GetPlayPose start");
-    mutex.lock();
+ //   mutex.lock();
+    const std::lock_guard<std::mutex> lock(mutex);
+
     int total = 0;
     if (iDemux) {
         total = iDemux->totalMs;
@@ -163,7 +173,7 @@ double IPlayer::GetPlayPose() {
             pos = (double) videoDecode->pts / (double) total;
         }
     }
-    mutex.unlock();
+  //  mutex.unlock();
     LOGD("seek debug:GetPlayPose end");
 
     return pos;
@@ -178,7 +188,10 @@ bool IPlayer::Seek(double position) {
     SetPause(true);
     LOGS("seek debug:Seek start");
 
-    mutex.lock();
+   // mutex.lock();
+    {
+    const std::lock_guard<std::mutex> lock(mutex);
+
     //清理各个模块缓冲队列
     LOGS("mutex.lock()");
     if (audioDecode) {
@@ -197,46 +210,46 @@ bool IPlayer::Seek(double position) {
     LOGS("iDemux->Seek end");
     //假如没有视频，则函数返回
     if (!videoDecode) {
-        mutex.unlock();
+    //    mutex.unlock();
         //seek之后重新开启所有的线程
         SetPause(false);
         return re;
     }
 
     //在position时间点之前的帧都丢弃，从实际需要显示的帧开始
-//    int seekPts = position * iDemux->totalMs;
-//    while (!isExit) {
-//        XData pkt = iDemux->Read();
-//        if (pkt.size <= 0) {
-//            break;
-//        }
-//
-//        if (pkt.isAudio) {
-//            //pts小于seekPts则丢弃
-//            if (pkt.pts < seekPts) {
-//                pkt.Drop();
-//                continue;
-//            }
-//            //pts不小于seekPts则交给audioDecode处理
-//            iDemux->notify(pkt);
-//            continue;
-//        }
-//
-//        videoDecode->SendPacket(pkt);
-//        pkt.Drop();
-//        XData data = videoDecode->RecvFrame();
-//        if (data.size <= 0) {
-//            continue;
-//        }
-//
-//        if (data.pts >= seekPts) {
-//            videoDecode->notify(data);
-//            break;
-//        }
-//
-//    }
+    int seekPts = position * iDemux->totalMs;
+    while (!isExit) {
+        XData pkt = iDemux->Read();
+        if (pkt.size <= 0) {
+            break;
+        }
 
-    mutex.unlock();
+        if (pkt.isAudio) {
+            //pts小于seekPts则丢弃
+            if (pkt.pts < seekPts) {
+                pkt.Drop();
+                continue;
+            }
+            //pts不小于seekPts则交给audioDecode处理
+            iDemux->notify(pkt);
+            continue;
+        }
+
+        videoDecode->SendPacket(pkt);
+        pkt.Drop();
+        XData data = videoDecode->RecvFrame();
+        if (data.size <= 0) {
+            continue;
+        }
+
+        if (data.pts >= seekPts) {
+            videoDecode->notify(data);
+            break;
+        }
+
+    }
+    }
+  //  mutex.unlock();
     LOGS("seek debug:Seek end");
     //seek之后重新开启所有的线程
     SetPause(false);
@@ -244,7 +257,9 @@ bool IPlayer::Seek(double position) {
 }
 
 void IPlayer::SetPause(bool isP) {
-    mutex.lock();
+ //   mutex.lock();
+    const std::lock_guard<std::mutex> lock(mutex);
+
     XThread::SetPause(isP);
     if (iDemux) {
         iDemux->SetPause(isP);
@@ -259,7 +274,7 @@ void IPlayer::SetPause(bool isP) {
         LOGS("audioPlay->SetPause:");
         audioPlay->SetPause(isP);
     }
-    mutex.unlock();
+  //  mutex.unlock();
 }
 
 

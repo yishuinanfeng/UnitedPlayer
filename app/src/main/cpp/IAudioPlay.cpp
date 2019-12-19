@@ -13,14 +13,24 @@ void IAudioPlay::Update(XData xData) {
     }
     //如果framelist满了，则一直循环（类似自旋）
     while (!isExit) {
-        frameMutex.lock();
+        //frameMutex.lock();
+        LOGLOCK("IAudioPlay Update packsMutex.lock() start");
+        const std::lock_guard<std::mutex> lock(frameMutex);
+        LOGLOCK("IAudioPlay Update packsMutex.lock() end");
         if (framelist.size() >= maxFrame) {
-            frameMutex.unlock();
+            //  frameMutex.unlock();
+            LOGLOCK("IAudioPlay framelist.size() >= maxFrame");
+            LOGLOCK("IAudioPlay Update packsMutex.unlock()1");
             Sleep(1);
+            //这里如果死暂停则跳出循环，否则会导致IDecode发生死锁！！！！！
+            if (!IsPause()) {
+                break;
+            }
             continue;
         }
         framelist.push_back(xData);
-        frameMutex.unlock();
+        //      frameMutex.unlock();
+        LOGLOCK("IAudioPlay Update packsMutex.unlock()2");
         break;
     }
 }
@@ -40,15 +50,16 @@ XData IAudioPlay::GetData() {
 
         LOGE("IAudioPlay::GetData resume");
 
-        frameMutex.lock();
+        //   frameMutex.lock();
+        const std::lock_guard<std::mutex> lock(frameMutex);
         if (!framelist.empty()) {
             data = framelist.front();
             framelist.pop_front();
-            frameMutex.unlock();
+            //   frameMutex.unlock();
             pst = data.pts;
             return data;
         }
-        frameMutex.unlock();
+        //    frameMutex.unlock();
         //停顿下，为了减轻cpu负荷
         Sleep(1);
     }
@@ -58,10 +69,15 @@ XData IAudioPlay::GetData() {
 }
 
 void IAudioPlay::Clear() {
-    frameMutex.lock();
+    //  frameMutex.lock();
+    LOGLOCK("IAudioPlay Clear packsMutex.lock() start");
+    const std::lock_guard<std::mutex> lock(frameMutex);
+    LOGLOCK("IAudioPlay Clear packsMutex.lock() end");
     while (!framelist.empty()) {
         framelist.front().Drop();
         framelist.pop_front();
     }
-    frameMutex.unlock();
+
+    LOGLOCK("IAudioPlay Clear packsMutex.unlock()");
+    //   frameMutex.unlock();
 }
