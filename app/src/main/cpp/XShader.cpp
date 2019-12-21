@@ -50,6 +50,44 @@ static const char *fragYUV420P = GET_STR(
             gl_FragColor = vec4(rgb, 1.0);
         }
 );
+//使用滤镜
+static const char *fragYUV420PFilter = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uTexture;
+        uniform
+        sampler2D vTexture;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uTexture, vTextCoord).r - 0.5;
+            yuv.b = texture2D(vTexture, vTextCoord).r - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv; 
+            if (vTextCoord.x < 0.5 && vTextCoord.y < 0.5) {
+                //反色滤镜
+                gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
+            } else if (vTextCoord.x > 0.5 && vTextCoord.y > 0.5) {
+                float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
+                gl_FragColor = vec4(gray, gray, gray, 1.0);
+            } else {
+                gl_FragColor = vec4(rgb, 1.0);
+
+            }
+
+        }
+);
 
 static const char *fragNV12 = GET_STR(
         precision
@@ -143,7 +181,7 @@ bool XShader::Init(XShaderType shaderType) {
     const std::lock_guard<std::mutex> lock(mutex);
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
-     //   mutex.unlock();
+        //   mutex.unlock();
         LOGDT("XShader initShader GL_VERTEX_SHADER failed");
         return false;
     }
@@ -159,12 +197,12 @@ bool XShader::Init(XShaderType shaderType) {
             fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
             break;
         default:
-          //  mutex.unlock();
+            //  mutex.unlock();
             LOGDT("XShaderType is error");
             return false;
     }
     if (fsh == 0) {
-      //  mutex.unlock();
+        //  mutex.unlock();
         LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
         return false;
     }
@@ -173,7 +211,7 @@ bool XShader::Init(XShaderType shaderType) {
     //创建渲染程序
     program = glCreateProgram();
     if (program == 0) {
-     //   mutex.unlock();
+        //   mutex.unlock();
         LOGDT("XShader glCreateProgram failed");
         return false;
     }
@@ -187,7 +225,7 @@ bool XShader::Init(XShaderType shaderType) {
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {
-    //    mutex.unlock();
+        //    mutex.unlock();
         LOGDT("XShader glLinkProgram failed");
         return false;
     }
@@ -234,7 +272,7 @@ bool XShader::Init(XShaderType shaderType) {
             break;
 
     }
- //   mutex.unlock();
+    //   mutex.unlock();
     LOGDT("XShader 初始化Shader成功");
     return true;
 }
@@ -254,7 +292,7 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
         //带透明通道，按照亮度和alpha值存储纹理单元
         format = GL_LUMINANCE_ALPHA;
     }
- //   mutex.lock();
+    //   mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
 
     if (textures[index] == 0) {
@@ -300,21 +338,21 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
 }
 
 void XShader::Draw() {
-  //  mutex.lock();
+    //  mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
 
     if (!program) {
-       // mutex.unlock();
+        // mutex.unlock();
         return;
     }
     LOGE("xShader Draw");
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
- //   mutex.unlock();
+    //   mutex.unlock();
 }
 
 void XShader::Close() {
- //   mutex.lock();
+    //   mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
 
     //要先释放program，如果先释放shader的话程序还会访问shader，导致出错？
@@ -334,6 +372,6 @@ void XShader::Close() {
         }
         textures[i] = 0;
     }
-  //  mutex.unlock();
+    //  mutex.unlock();
 
 }
