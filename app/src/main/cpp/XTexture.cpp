@@ -43,7 +43,7 @@ public:
         return isInit;
     }
 
-    virtual void Draw(unsigned char *data[], int width, int height) {
+    virtual void Draw(unsigned char *data[], int width, int height, int pts) {
      //   mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
         xShader.GetTexture(0, width, height, data[0]);//Y
@@ -58,7 +58,7 @@ public:
             xShader.GetTexture(1, width / 2, height / 2, data[1], true);//UV
         }
 
-        xShader.Draw();
+        xShader.Draw(pts);
         XEGL::Get()->Draw();
    //     mutex.unlock();
     }

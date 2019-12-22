@@ -179,6 +179,7 @@ double IPlayer::GetPlayPose() {
     return pos;
 }
 
+
 bool IPlayer::Seek(double position) {
     if (!iDemux) {
         return false;

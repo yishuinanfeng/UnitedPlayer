@@ -24,8 +24,7 @@ public:
     virtual void
     GetTexture(unsigned int index, int width, int height, unsigned char *buf, bool isA = false);
 
-    virtual void Draw();
-
+    virtual void Draw(int i);
 
     //避免头文件引入了OpenGL依赖
     unsigned int vsh = 0;
@@ -34,6 +33,8 @@ public:
     //100层的纹理id数组
     unsigned int textures[100] = {0};
     std::mutex mutex;
+
+    int uTimeId = 0;
 
 };
 

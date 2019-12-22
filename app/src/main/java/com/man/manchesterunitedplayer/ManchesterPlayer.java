@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 
@@ -64,6 +65,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     public void onClick(View view) {
         pausePlay();
     }
+
 
     private native void pausePlay();
 

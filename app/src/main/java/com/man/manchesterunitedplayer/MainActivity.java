@@ -45,12 +45,16 @@ public class MainActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     @Override
     public void run() {
         for (; ; ) {
-            seekBar.setProgress((int) (getPlayPos() * seekBar.getMax()));
+            int pos = (int) (getPlayPos() * seekBar.getMax());
+            if (pos == 0){
+                continue;
+            }
+            seekBar.setProgress(pos);
             if (isSeekThreadStop) {
                 break;
             }
             try {
-                Thread.sleep(40);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

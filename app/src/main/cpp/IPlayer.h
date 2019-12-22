@@ -20,6 +20,8 @@ class IResample;
 class IVideoView;
 
 class IAudioPlay;
+//todo 为什么这里给其他类使用会链接失败？？？
+//int videoPts = 0;
 
 /**
  * 整个播放器的入口类，屏蔽内部具体技术实现

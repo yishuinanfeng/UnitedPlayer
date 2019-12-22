@@ -4,12 +4,15 @@
 
 #include "XShader.h"
 #include "XLog.h"
+#include "IPlayer.h"
 #include <GLES2/gl2.h>
 #include <ctime>
 
 //顶点着色器(static的意义)
 #define GET_STR(x) #x
 static const char *vertexShader = GET_STR(
+        uniform float u_time;
+        varying float time;
         attribute
         vec4 aPosition;//输入的顶点坐标
         attribute
@@ -20,6 +23,7 @@ static const char *vertexShader = GET_STR(
             //这里其实是将上下翻转过来（因为安卓图片会自动上下翻转，所以转回来）
             vTextCoord = vec2(aTextCoord.x, 1.0 - aTextCoord.y);
             gl_Position = aPosition;
+            time = u_time;
         }
 );
 
@@ -63,6 +67,7 @@ static const char *fragYUV420PFilter = GET_STR(
         sampler2D uTexture;
         uniform
         sampler2D vTexture;
+        varying float time;
         void main() {
             vec3 yuv;
             vec3 rgb;
@@ -74,17 +79,33 @@ static const char *fragYUV420PFilter = GET_STR(
                     1.0, 1.0, 1.0,
                     0.0, -0.39465, 2.03211,
                     1.13983, -0.5806, 0.0
-            ) * yuv; 
-            if (vTextCoord.x < 0.5 && vTextCoord.y < 0.5) {
-                //反色滤镜
-                gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
-            } else if (vTextCoord.x > 0.5 && vTextCoord.y > 0.5) {
-                float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
-                gl_FragColor = vec4(gray, gray, gray, 1.0);
-            } else {
-                gl_FragColor = vec4(rgb, 1.0);
+            ) * yuv;
 
+            float filterType = sin(time / 400.0);
+            if (filterType > 0.0) {
+                if (vTextCoord.x < 0.5 && vTextCoord.y < 0.5) {
+                    //反色滤镜
+                    gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
+                } else if (vTextCoord.x > 0.5 && vTextCoord.y > 0.5) {
+                    float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
+                    gl_FragColor = vec4(gray, gray, gray, 1.0);
+                } else {
+                    gl_FragColor = vec4(rgb, 1.0);
+
+                }
+            } else {
+                if (vTextCoord.x > 0.5 && vTextCoord.y < 0.5) {
+                    //反色滤镜
+                    gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
+                } else if (vTextCoord.x < 0.5 && vTextCoord.y > 0.5) {
+                    float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
+                    gl_FragColor = vec4(gray, gray, gray, 1.0);
+                } else {
+                    gl_FragColor = vec4(rgb, 1.0);
+
+                }
             }
+
 
         }
 );
@@ -166,12 +187,16 @@ GLuint initShader(const char *source, GLint type) {
     GLint status;
     glGetShaderiv(sh, GL_COMPILE_STATUS, &status);
     if (status == 0) {
-        LOGDT("glCompileShader %d failed", type);
-        LOGDT("source %s", source);
+        int logLength;
+        glGetShaderiv(sh, GL_INFO_LOG_LENGTH, &logLength);
+        char *logBuffer = new char[logLength];
+        glGetShaderInfoLog(sh, logLength, NULL, logBuffer);
+        LOGDSHADER("glCompileShader %d failed,log:%s", type, logBuffer);
+        LOGDSHADER("source %s", source);
         return 0;
     }
 
-    LOGDT("glCompileShader %d success", type);
+    LOGDSHADER("glCompileShader %d success", type);
     return sh;
 }
 
@@ -188,7 +213,8 @@ bool XShader::Init(XShaderType shaderType) {
     LOGDT("XShader initShader GL_VERTEX_SHADER success");
     switch (shaderType) {
         case XSHDER_YUV420P:
-            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+            //    fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+            fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
             break;
         case XSHDER_NV12:
             fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
@@ -255,6 +281,8 @@ bool XShader::Init(XShaderType shaderType) {
     GLuint aTex = static_cast<GLuint>(glGetAttribLocation(program, "aTextCoord"));
     glEnableVertexAttribArray(aTex);
     glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, 8, fragment);
+
+    uTimeId = glGetUniformLocation(program, "u_time");
 
     //纹理初始化
     //设置纹理层
@@ -337,7 +365,7 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
 //    mutex.unlock();
 }
 
-void XShader::Draw() {
+void XShader::Draw(int pts) {
     //  mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
 
@@ -346,6 +374,8 @@ void XShader::Draw() {
         return;
     }
     LOGE("xShader Draw");
+
+    glUniform1f(uTimeId, pts);
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     //   mutex.unlock();
@@ -375,3 +405,4 @@ void XShader::Close() {
     //  mutex.unlock();
 
 }
+
