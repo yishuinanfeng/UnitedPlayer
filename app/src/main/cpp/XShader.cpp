@@ -213,8 +213,8 @@ bool XShader::Init(XShaderType shaderType) {
     LOGDT("XShader initShader GL_VERTEX_SHADER success");
     switch (shaderType) {
         case XSHDER_YUV420P:
-            //    fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
-            fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
+               fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+           // fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
             break;
         case XSHDER_NV12:
             fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);

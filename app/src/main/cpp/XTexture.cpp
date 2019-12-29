@@ -54,7 +54,7 @@ public:
             xShader.GetTexture(2, width / 2, height / 2, data[2]);//V
             LOGDT("GetTexture data v:%d:", *data[2]);
         } else {
-            //NV12和NV21解码出来为Y和U两个数组
+            //NV12和NV21解码出来为Y和UV两个数组
             xShader.GetTexture(1, width / 2, height / 2, data[1], true);//UV
         }
 

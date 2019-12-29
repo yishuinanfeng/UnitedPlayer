@@ -28,7 +28,7 @@ bool IPlayer::Open(const char *path) {
         return false;
     }
     //下面这几个之所以没有return false，是因为可能是不需要解码或重采样的原始数据
-    if (!videoDecode || !videoDecode->Open(iDemux->GetVideoParameter())) {
+    if (!videoDecode || !videoDecode->Open(iDemux->GetVideoParameter(),true)) {
         LOGE("videoDecode open %s fail", path);
     }
     if (!audioDecode || !audioDecode->Open(iDemux->GetAudioParameter())) {

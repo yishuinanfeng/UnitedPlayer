@@ -16,7 +16,7 @@ void GLVideoView::Render(XData xData) {
         xTexture-> Init(view, static_cast<XTextureType>(xData.format));
     }
     xTexture->Draw(xData.datas, xData.width, xData.height, xData.pts);
-    LOGE("Render end");
+    LOG_VIDEO_DIMENSION("xData.width:%d, xData.height:%d",xData.width, xData.height);
 }
 
 void GLVideoView::SetRender(void *win) {
