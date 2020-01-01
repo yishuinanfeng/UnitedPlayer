@@ -13,7 +13,7 @@ include_directories(include)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        glRecoder
+        record-lib
 
         # Sets the library as a shared library.
         SHARED
@@ -41,7 +41,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        glRecoder
+        record-lib
         android
         OpenSLES
         # Links the target library to the log library

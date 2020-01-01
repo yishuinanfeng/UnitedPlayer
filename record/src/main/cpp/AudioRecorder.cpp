@@ -100,32 +100,31 @@ void recordDataCallBack(short *pInt) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haha_openslrecorder_MainActivity_startRecord(JNIEnv *env, jobject thiz,
-                                                      jstring audio_path) {
-    const char *path = env->GetStringUTFChars(audio_path, NULL);
+Java_com_haha_record_VideoActivity_startRecord(JNIEnv *env, jobject thiz) {
 
     env->GetJavaVM(&javaVM);
     mAGlobalObject = env->NewGlobalRef(thiz);
-
+    LOGD("new RecordBuffer");
     recordBuffer = new RecordBuffer(BUFFER_SIZE);
-    pcmFile = fopen(path, "w");
-
+    LOGD("slCreateEngine");
     slCreateEngine(&slObjectEngine, 0, NULL, 0, NULL, NULL);
-
+    LOGD("Realize");
     (*slObjectEngine)->Realize(slObjectEngine, SL_BOOLEAN_FALSE);
+    LOGD("GetInterface");
     (*slObjectEngine)->GetInterface(slObjectEngine, SL_IID_ENGINE, &slEngineItf);
     //输入设备属性配置
+    LOGD("locatorIoDevice");
     SLDataLocator_IODevice locatorIoDevice = {SL_DATALOCATOR_IODEVICE,
                                               SL_IODEVICE_AUDIOINPUT,
                                               SL_DEFAULTDEVICEID_AUDIOINPUT,
                                               NULL};
     SLDataSource audioSrc = {&locatorIoDevice, NULL};
-
+    LOGD("dataLocatorAndroidSimpleBufferQueue");
     SLDataLocator_AndroidSimpleBufferQueue dataLocatorAndroidSimpleBufferQueue = {
             SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
             2
     };
-
+    LOGD("slDataFormatPcm");
     //音频格式，声道数，采样率，位深，位深，声道布局，内存对齐方式
     SLDataFormat_PCM slDataFormatPcm = {
             SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -141,12 +140,14 @@ Java_com_haha_openslrecorder_MainActivity_startRecord(JNIEnv *env, jobject thiz,
     //加的功能点（这里只加了队列，还有环绕、均衡器等功能可以加）
     const SLInterfaceID id[1] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE};
     const SLboolean req[1] = {SL_BOOLEAN_TRUE};
-
+    LOGD("CreateAudioRecorder");
     (*slEngineItf)->CreateAudioRecorder(slEngineItf, &recordObj, &audioSrc, &slDataSink, 1, id,
                                         req);
+    LOGD("Realize recordObj");
     (*recordObj)->Realize(recordObj, SL_BOOLEAN_FALSE);
+    LOGD("GetInterface(recordObj");
     (*recordObj)->GetInterface(recordObj, SL_IID_RECORD, &recordItf);
-
+    LOGD("GetInterface(recordObj, SL_IID_ANDROIDSIMPLEBUFFERQUEUE");
     (*recordObj)->GetInterface(recordObj, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                &slAndroidSimpleBufferQueueItf);
     (*slAndroidSimpleBufferQueueItf)->Enqueue(slAndroidSimpleBufferQueueItf,
@@ -155,11 +156,10 @@ Java_com_haha_openslrecorder_MainActivity_startRecord(JNIEnv *env, jobject thiz,
                                                        recordCallBack, NULL);
     (*recordItf)->SetRecordState(recordItf, SL_RECORDSTATE_RECORDING);
 
-    env->ReleaseStringUTFChars(audio_path, path);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haha_openslrecorder_MainActivity_stopRecord(JNIEnv *env, jobject thiz) {
+Java_com_haha_record_VideoActivity_stopRecord(JNIEnv *env, jobject thiz) {
     isFinish = true;
 }

@@ -29,6 +29,61 @@ public class VideoActivity extends AppCompatActivity {
     private MediaEncoder mediaEncodec;
     //提供音乐
     private WlMusic wlMusic;
+    private boolean finish = false;
+
+    static {
+        System.loadLibrary("record-lib");
+    }
+
+    private void start() {
+        finish = false;
+        btnRecord.setText("正在录制");
+        //准备写入数据
+        startRecord();
+        if (mediaEncodec == null) {
+            Log.d("ywl5320", "textureid is " + cameraView.getTextureId());
+            mediaEncodec = new MediaEncoder(VideoActivity.this, cameraView.getTextureId());
+            mediaEncodec.initEncoder(cameraView.getEglContext(),
+                    Environment.getExternalStorageDirectory().getAbsolutePath() + "/manlian.mp4"
+                    , 720, 1280, 44100);
+            mediaEncodec.setOnMediaInfoListener(new BaseMediaEncoder.OnMediaInfoListener() {
+                @Override
+                public void onMediaTime(long times) {
+                    Log.d(TAG, "time is : " + times);
+                }
+            });
+
+            mediaEncodec.startRecord();
+        }
+    }
+
+    private void stop() {
+        stopRecord();
+        finish = true;
+        //停止写入数据
+        mediaEncodec.stopRecord();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                btnRecord.setText("开始录制");
+            }
+        });
+        mediaEncodec = null;
+    }
+
+    void onPcmDataInput(byte[] pcmData) {
+        if (finish) {
+            return;
+        }
+        Log.d("OpenSlDemo", "onPcmDataInput pcmData size:${pcmData.size}");
+        if (mediaEncodec != null) {
+            mediaEncodec.putPcmData(pcmData, pcmData.length);
+        }
+    }
+
+    native void startRecord();
+
+    native void stopRecord();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,73 +92,79 @@ public class VideoActivity extends AppCompatActivity {
         cameraView = findViewById(R.id.cameraview);
         btnRecord = findViewById(R.id.btn_record);
 
-        wlMusic = WlMusic.getInstance();
-        wlMusic.setCallBackPcmData(true);
-
-        wlMusic.setOnPreparedListener(new OnPreparedListener() {
-            @Override
-            public void onPrepared() {
-                wlMusic.playCutAudio(39, 60);
-            }
-        });
-
-        wlMusic.setOnCompleteListener(new OnCompleteListener() {
-            @Override
-            public void onComplete() {
-                mediaEncodec.stopRecord();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btnRecord.setText("开始录制");
-                    }
-                });
-                mediaEncodec = null;
-            }
-        });
-
-        wlMusic.setOnShowPcmDataListener(new OnShowPcmDataListener() {
-            @Override
-            public void onPcmInfo(int samplerate, int bit, int channels) {
-                if (mediaEncodec == null) {
-                    Log.d("ywl5320", "textureid is " + cameraView.getTextureId());
-                    mediaEncodec = new MediaEncoder(VideoActivity.this, cameraView.getTextureId());
-                    mediaEncodec.initEncoder(cameraView.getEglContext(),
-                            Environment.getExternalStorageDirectory().getAbsolutePath() + "/manlian.mp4"
-                            , 720, 1280, samplerate);
-                    mediaEncodec.setOnMediaInfoListener(new BaseMediaEncoder.OnMediaInfoListener() {
-                        @Override
-                        public void onMediaTime(long times) {
-                            Log.d(TAG, "time is : " + times);
-                        }
-                    });
-
-                    mediaEncodec.startRecord();
-                }
-
-
-            }
-
-            @Override
-            public void onPcmData(byte[] pcmdata, int size, long clock) {
-                if (mediaEncodec != null) {
-                    mediaEncodec.putPcmData(pcmdata, size);
-                }
-            }
-
-        });
+//        wlMusic = WlMusic.getInstance();
+//        wlMusic.setCallBackPcmData(true);
+//
+//        wlMusic.setOnPreparedListener(new OnPreparedListener() {
+//            @Override
+//            public void onPrepared() {
+//                wlMusic.playCutAudio(39, 60);
+//            }
+//        });
+//
+//        wlMusic.setOnCompleteListener(new OnCompleteListener() {
+//            @Override
+//            public void onComplete() {
+//                mediaEncodec.stopRecord();
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        btnRecord.setText("开始录制");
+//                    }
+//                });
+//                mediaEncodec = null;
+//            }
+//        });
+//
+//        wlMusic.setOnShowPcmDataListener(new OnShowPcmDataListener() {
+//            @Override
+//            public void onPcmInfo(int samplerate, int bit, int channels) {
+//                if (mediaEncodec == null) {
+//                    Log.d("ywl5320", "textureid is " + cameraView.getTextureId());
+//                    mediaEncodec = new MediaEncoder(VideoActivity.this, cameraView.getTextureId());
+//                    mediaEncodec.initEncoder(cameraView.getEglContext(),
+//                            Environment.getExternalStorageDirectory().getAbsolutePath() + "/manlian.mp4"
+//                            , 720, 1280, samplerate);
+//                    mediaEncodec.setOnMediaInfoListener(new BaseMediaEncoder.OnMediaInfoListener() {
+//                        @Override
+//                        public void onMediaTime(long times) {
+//                            Log.d(TAG, "time is : " + times);
+//                        }
+//                    });
+//
+//                    mediaEncodec.startRecord();
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            public void onPcmData(byte[] pcmdata, int size, long clock) {
+//                if (mediaEncodec != null) {
+//                    mediaEncodec.putPcmData(pcmdata, size);
+//                }
+//            }
+//
+//        });
     }
 
     public void record(View view) {
         //因为停止录制的时候会将wlMediaEncodec置为空，所以可以根据wlMediaEncodec是否为空判断是否是正在录制状态
+//        if (mediaEncodec == null) {
+//            wlMusic.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/haikuotiankong.mp3");
+//            wlMusic.prePared();
+//            btnRecord.setText("正在录制");
+//        } else {
+//            mediaEncodec.stopRecord();
+//            btnRecord.setText("开始录制");
+//            mediaEncodec = null;
+//            wlMusic.stop();
+//        }
+
         if (mediaEncodec == null) {
-            wlMusic.setSource(Environment.getExternalStorageDirectory().getAbsolutePath() + "/haikuotiankong.mp3");
-            wlMusic.prePared();
-            btnRecord.setText("正在录制");
+            start();
         } else {
-            mediaEncodec.stopRecord();
-            btnRecord.setText("开始录制");
-            mediaEncodec = null;
-            wlMusic.stop();
+            stop();
         }
 
     }

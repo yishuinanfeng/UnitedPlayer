@@ -141,7 +141,7 @@ open class BaseMediaEncoder(val context: Context) {
         savePath: String,
         width: Int,
         height: Int,
-        sampleRate: Int
+        sampleRate: Int = 44100
     ) {
         this.width = width
         this.height = height

@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OpenUrlActivity" />
+        <activity android:name=".OpenUrlActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".PlayActivity" android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

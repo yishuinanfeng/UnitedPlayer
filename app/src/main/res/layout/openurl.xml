@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName"
-                android:text="/sdcard/manlian.mp4" />
+                android:text="/sdcard/v1080.mp4" />
 
             <Button
                 android:id="@+id/playvideo"
