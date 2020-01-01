@@ -2,88 +2,31 @@ package com.man.manchesterunitedplayer;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.SeekBar;
 
-public class MainActivity extends Activity implements Runnable, SeekBar.OnSeekBarChangeListener {
+import com.haha.record.VideoActivity;
 
-    private SeekBar seekBar;
-
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
-
-        findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tv_play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, OpenUrlActivity.class);
+                Intent intent = new Intent(MainActivity.this,PlayActivity.class);
                 startActivity(intent);
             }
         });
-        seekBar = findViewById(R.id.progressBar);
-        seekBar.setOnSeekBarChangeListener(this);
 
-        new Thread(this).start();
-    }
-
-    private native double getPlayPos();
-
-    @Override
-    public void run() {
-        for (; ; ) {
-            int pos = (int) (getPlayPos() * seekBar.getMax());
-            if (pos == 0){
-                continue;
+        findViewById(R.id.tv_record).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                startActivity(intent);
             }
-            seekBar.setProgress(pos);
-            if (isSeekThreadStop) {
-                break;
-            }
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        });
     }
-
-    private boolean isSeekThreadStop;
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        isSeekThreadStop = true;
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-        seek((double) seekBar.getProgress() / (double) seekBar.getMax());
-    }
-
-    private native void seek(double position);
 }
-

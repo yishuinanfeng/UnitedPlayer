@@ -1,11 +1,12 @@
-package com.haha.cameraopengl.camera
+package com.haha.record.camera
 
 import android.content.Context
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
 import android.util.Log
-import com.haha.cameraopengl.util.DisplayUtil
+import com.haha.record.util.DisplayUtil
+
 
 class CustomCamera(private val context: Context) {
 

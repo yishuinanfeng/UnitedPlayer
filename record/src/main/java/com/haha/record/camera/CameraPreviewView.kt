@@ -6,7 +6,6 @@ import android.hardware.Camera
 import android.util.AttributeSet
 import android.util.Log
 import android.view.WindowManager
-import com.haha.cameraopengl.camera.CustomCamera
 import com.haha.record.egl.CustomGlSurfaceView
 
 class CameraPreviewView : CustomGlSurfaceView {
