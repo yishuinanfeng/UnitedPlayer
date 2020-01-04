@@ -21,6 +21,7 @@
         </activity>
         <activity android:name=".OpenUrlActivity" android:screenOrientation="landscape"/>
         <activity android:name=".PlayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".PlayListActivity" />
     </application>
 
 </manifest>

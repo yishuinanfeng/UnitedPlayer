@@ -5,167 +5,11 @@
 #include "XShader.h"
 #include "XLog.h"
 #include "IPlayer.h"
+#include "Shader.h"
 #include <GLES2/gl2.h>
 #include <ctime>
 
-//顶点着色器(static的意义)
-#define GET_STR(x) #x
-static const char *vertexShader = GET_STR(
-        uniform float u_time;
-        varying float time;
-        attribute
-        vec4 aPosition;//输入的顶点坐标
-        attribute
-        vec2 aTextCoord;//输入的纹理坐标
-        varying
-        vec2 vTextCoord;//输出的纹理坐标
-        void main() {
-            //这里其实是将上下翻转过来（因为安卓图片会自动上下翻转，所以转回来）
-            vTextCoord = vec2(aTextCoord.x, 1.0 - aTextCoord.y);
-            gl_Position = aPosition;
-            time = u_time;
-        }
-);
-
-static const char *fragYUV420P = GET_STR(
-        precision
-        mediump float;
-        varying
-        vec2 vTextCoord;
-        //输入的yuv三个纹理
-        uniform
-        sampler2D yTexture;
-        uniform
-        sampler2D uTexture;
-        uniform
-        sampler2D vTexture;
-        void main() {
-            vec3 yuv;
-            vec3 rgb;
-            //分别取yuv各个分量的采样纹理（r表示？）
-            yuv.r = texture2D(yTexture, vTextCoord).r;
-            yuv.g = texture2D(uTexture, vTextCoord).r - 0.5;
-            yuv.b = texture2D(vTexture, vTextCoord).r - 0.5;
-            rgb = mat3(
-                    1.0, 1.0, 1.0,
-                    0.0, -0.39465, 2.03211,
-                    1.13983, -0.5806, 0.0
-            ) * yuv;
-            gl_FragColor = vec4(rgb, 1.0);
-        }
-);
-//使用滤镜
-static const char *fragYUV420PFilter = GET_STR(
-        precision
-        mediump float;
-        varying
-        vec2 vTextCoord;
-        //输入的yuv三个纹理
-        uniform
-        sampler2D yTexture;
-        uniform
-        sampler2D uTexture;
-        uniform
-        sampler2D vTexture;
-        varying float time;
-        void main() {
-            vec3 yuv;
-            vec3 rgb;
-            //分别取yuv各个分量的采样纹理（r表示？）
-            yuv.r = texture2D(yTexture, vTextCoord).r;
-            yuv.g = texture2D(uTexture, vTextCoord).r - 0.5;
-            yuv.b = texture2D(vTexture, vTextCoord).r - 0.5;
-            rgb = mat3(
-                    1.0, 1.0, 1.0,
-                    0.0, -0.39465, 2.03211,
-                    1.13983, -0.5806, 0.0
-            ) * yuv;
-
-            float filterType = sin(time / 400.0);
-            if (filterType > 0.0) {
-                if (vTextCoord.x < 0.5 && vTextCoord.y < 0.5) {
-                    //反色滤镜
-                    gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
-                } else if (vTextCoord.x > 0.5 && vTextCoord.y > 0.5) {
-                    float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
-                    gl_FragColor = vec4(gray, gray, gray, 1.0);
-                } else {
-                    gl_FragColor = vec4(rgb, 1.0);
-
-                }
-            } else {
-                if (vTextCoord.x > 0.5 && vTextCoord.y < 0.5) {
-                    //反色滤镜
-                    gl_FragColor = vec4(vec3(1.0 - rgb.r, 1.0 - rgb.g, 1.0 - rgb.b), 1.0);
-                } else if (vTextCoord.x < 0.5 && vTextCoord.y > 0.5) {
-                    float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
-                    gl_FragColor = vec4(gray, gray, gray, 1.0);
-                } else {
-                    gl_FragColor = vec4(rgb, 1.0);
-
-                }
-            }
-
-
-        }
-);
-
-static const char *fragNV12 = GET_STR(
-        precision
-        mediump float;
-        varying
-        vec2 vTextCoord;
-        //输入的yuv三个纹理
-        uniform
-        sampler2D yTexture;
-        uniform
-        sampler2D uvTexture;
-        void main() {
-            vec3 yuv;
-            vec3 rgb;
-            //分别取yuv各个分量的采样纹理（r表示？）
-            //这里texture2D(yTexture, vTextCoord).r取.g.b效果也是一样的
-            yuv.r = texture2D(yTexture, vTextCoord).r;
-            yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
-            //NV12会把V采样到a通道
-            yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
-            rgb = mat3(
-                    1.0, 1.0, 1.0,
-                    0.0, -0.39465, 2.03211,
-                    1.13983, -0.5806, 0.0
-            ) * yuv;
-            gl_FragColor = vec4(rgb, 1.0);
-        }
-);
-
-static const char *fragNV21 = GET_STR(
-        precision
-        mediump float;
-        varying
-        vec2 vTextCoord;
-        //输入的yuv三个纹理
-        uniform
-        sampler2D yTexture;
-        uniform
-        sampler2D uvTexture;
-        void main() {
-            vec3 yuv;
-            vec3 rgb;
-            //分别取yuv各个分量的采样纹理（r表示？）
-            yuv.r = texture2D(yTexture, vTextCoord).r;
-            yuv.g = texture2D(uvTexture, vTextCoord).a - 0.5;
-            yuv.b = texture2D(uvTexture, vTextCoord).r - 0.5;
-            rgb = mat3(
-                    1.0, 1.0, 1.0,
-                    0.0, -0.39465, 2.03211,
-                    1.13983, -0.5806, 0.0
-            ) * yuv;
-            gl_FragColor = vec4(rgb, 1.0);
-        }
-);
-
 GLuint initShader(const char *source, int type);
-
 
 GLuint initShader(const char *source, GLint type) {
     //创建shader
@@ -202,7 +46,6 @@ GLuint initShader(const char *source, GLint type) {
 
 bool XShader::Init(XShaderType shaderType) {
     Close();
-    //mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
@@ -213,14 +56,16 @@ bool XShader::Init(XShaderType shaderType) {
     LOGDT("XShader initShader GL_VERTEX_SHADER success");
     switch (shaderType) {
         case XSHDER_YUV420P:
-               fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
-           // fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
+            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+            // fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
             break;
         case XSHDER_NV12:
-            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+         //   fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+            fsh = initShader(fragNV21Gray, GL_FRAGMENT_SHADER);
             break;
         case XSHDER_NV21:
-            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+         //   fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+            fsh = initShader(fragNV12Gray, GL_FRAGMENT_SHADER);
             break;
         default:
             //  mutex.unlock();
@@ -228,7 +73,6 @@ bool XShader::Init(XShaderType shaderType) {
             return false;
     }
     if (fsh == 0) {
-        //  mutex.unlock();
         LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
         return false;
     }
@@ -251,7 +95,6 @@ bool XShader::Init(XShaderType shaderType) {
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {
-        //    mutex.unlock();
         LOGDT("XShader glLinkProgram failed");
         return false;
     }
@@ -300,7 +143,7 @@ bool XShader::Init(XShaderType shaderType) {
             break;
 
     }
-    //   mutex.unlock();
+
     LOGDT("XShader 初始化Shader成功");
     return true;
 }
@@ -320,7 +163,7 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
         //带透明通道，按照亮度和alpha值存储纹理单元
         format = GL_LUMINANCE_ALPHA;
     }
-    //   mutex.lock();
+
     const std::lock_guard<std::mutex> lock(mutex);
 
     if (textures[index] == 0) {
@@ -362,15 +205,15 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
                     width, height,//加载的纹理宽度、高度。最好为2的次幂
                     format, GL_UNSIGNED_BYTE,
                     buf);
-//    mutex.unlock();
+
 }
 
 void XShader::Draw(int pts) {
-    //  mutex.lock();
+
     const std::lock_guard<std::mutex> lock(mutex);
 
     if (!program) {
-        // mutex.unlock();
+
         return;
     }
     LOGE("xShader Draw");
@@ -378,11 +221,10 @@ void XShader::Draw(int pts) {
     glUniform1f(uTimeId, pts);
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    //   mutex.unlock();
+
 }
 
 void XShader::Close() {
-    //   mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
 
     //要先释放program，如果先释放shader的话程序还会访问shader，导致出错？
@@ -402,7 +244,6 @@ void XShader::Close() {
         }
         textures[i] = 0;
     }
-    //  mutex.unlock();
 
 }
 
