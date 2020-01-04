@@ -79,10 +79,11 @@ IPlayer::IPlayer() {
 
 }
 
-bool IPlayer::InitView(void *win) {
+bool IPlayer::InitView(void *win, int filterType) {
     if (videoView) {
         videoView->Close();
         videoView->SetRender(win);
+        videoView->setFilterType(filterType);
     }
     return true;
 }

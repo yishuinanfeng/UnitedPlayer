@@ -23,8 +23,8 @@ public:
         delete this;
     }
 
-    virtual bool Init(void *win, XTextureType textureType) {
-    //    mutex.lock();
+    virtual bool Init(void *win, XTextureType textureType, int filterType) {
+
         const std::lock_guard<std::mutex> lock(mutex);
         XEGL::Get()->Close();
         xShader.Close();
@@ -33,12 +33,11 @@ public:
             LOGE("CXTexture win is NULL！");
         }
         if (!XEGL::Get()->Init(win)) {
-       //     mutex.unlock();
             return false;
         }
 
         LOGE("Init xShader");
-        bool isInit = xShader.Init(static_cast<XShaderType>(type));
+        bool isInit = xShader.Init(static_cast<XShaderType>(type), filterType);
     //    mutex.unlock();
         return isInit;
     }

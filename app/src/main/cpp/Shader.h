@@ -91,6 +91,38 @@ static const char *fragYUV420POppositeColor = GET_STR(
 );
 
 /**
+ * yuv420p反色 shader
+ */
+static const char *fragYUV420PGray = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uTexture;
+        uniform
+        sampler2D vTexture;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uTexture, vTextCoord).r - 0.5;
+            yuv.b = texture2D(vTexture, vTextCoord).r - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+            float gray = rgb.r * 0.2125 + rgb.g * 0.7154 + rgb.b * 0.0721;
+            gl_FragColor = vec4(gray, gray, gray, 1.0);
+        }
+);
+
+/**
  * yuv420p使用反色和灰度图轮播效果滤镜 shader
  */
 static const char *fragYUV420POppoColorAndGray = GET_STR(

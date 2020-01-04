@@ -18,9 +18,9 @@ jint JNI_OnLoad(JavaVM *vm, void *res) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobject thiz,
-                                                              jobject surface) {
+                                                              jobject surface,jint filterType) {
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
-    IPlayerProxy::Get()->InitView(win);
+    IPlayerProxy::Get()->InitView(win, filterType);
 }
 
 extern "C"
@@ -30,17 +30,23 @@ Java_com_man_manchesterunitedplayer_OpenUrlActivity_open(JNIEnv *env, jobject th
     const char *openUrl = env->GetStringUTFChars(url, 0);
     IPlayerProxy::Get()->Open(openUrl);
     IPlayerProxy::Get()->Start();
-}extern "C"
+}
+
+extern "C"
 JNIEXPORT jdouble JNICALL
 Java_com_man_manchesterunitedplayer_PlayActivity_getPlayPos(JNIEnv *env, jobject thiz) {
     // TODO: double可以直接返回？
     return IPlayerProxy::Get()->GetPlayPose();
-}extern "C"
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_PlayActivity_seek(JNIEnv *env, jobject thiz, jdouble position) {
     // TODO: implement seek()
     IPlayerProxy::Get()->Seek(position);
-}extern "C"
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_ManchesterPlayer_pausePlay(JNIEnv *env, jobject thiz) {
     // TODO: implement pausePlay()

@@ -16,13 +16,16 @@ public:
     virtual void SetRender(void *win);
 
     virtual void Render(XData xData);
-    //todo 没有调用？？
+
     virtual void Close();
+
+    virtual void setFilterType(int filterType);
 
 protected:
     void *view = 0;
     XTexture *xTexture = 0;
     std::mutex mutex1;
+    int filterType = -1;
 };
 
 

@@ -15,7 +15,7 @@ class XTexture {
 public:
     static XTexture *Create();
 
-    virtual bool Init(void *win, XTextureType textureType = XTEXTURE_YUV420P) = 0;
+    virtual bool Init(void *win, XTextureType textureType, int i) = 0;
 
     virtual void Draw(unsigned char *data[], int width, int height, int i) = 0;
 

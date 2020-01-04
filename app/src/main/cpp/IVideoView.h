@@ -15,6 +15,7 @@ public:
     virtual void Render(XData xData) = 0;
     virtual void Update(XData xData);
     virtual void Close() = 0;
+    virtual void setFilterType(int surfaceType) = 0;
 };
 
 

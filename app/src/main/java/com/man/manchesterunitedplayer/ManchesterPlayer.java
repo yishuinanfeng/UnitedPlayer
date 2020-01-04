@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
@@ -17,6 +18,7 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer, View.OnClickListener {
     private static final String TAG = ManchesterPlayer.class.getSimpleName();
+    private int filterType = -1;
 
     public ManchesterPlayer(Context context) {
         super(context);
@@ -31,7 +33,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG,"surfaceCreated");
-        initView(holder.getSurface());
+        initView(holder.getSurface(),filterType);
     }
 
     @Override
@@ -44,7 +46,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
         Log.d(TAG,"surfaceChanged");
     }
 
-    public native void initView(Object surface);
+    public native void initView(Surface holderSurface, int surface);
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
@@ -66,6 +68,9 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
         pausePlay();
     }
 
+    public void setFilterType(int filterType) {
+        this.filterType = filterType;
+    }
 
     private native void pausePlay();
 

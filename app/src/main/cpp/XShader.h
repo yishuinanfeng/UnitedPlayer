@@ -13,10 +13,17 @@ enum XShaderType {
     XSHDER_NV12 = 25, //每4个像素Y4 UV1
     XSHDER_NV21 = 26 //每4个像素Y4 VU1
 };
+/**
+ * 滤镜类型
+ */
+enum FilterType {
+    OPPOSITE_COLOR = 1,//反色
+    GRAY = 2, //灰度图
+};
 
 class XShader {
 public:
-    virtual bool Init(XShaderType shaderType = XSHDER_YUV420P);
+    virtual bool Init(XShaderType shaderType, int i);
 
     virtual void Close();
 
@@ -35,7 +42,13 @@ public:
     std::mutex mutex;
 
     int uTimeId = 0;
+    int filterType = -1;
 
+    void getShaderForYuv420p(int filterType);
+
+    void getShaderForNV12(int filterType);
+
+    void getShaderForNV21(int filterType);
 };
 
 

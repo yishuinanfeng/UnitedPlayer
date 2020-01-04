@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -27,6 +28,10 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_play);
+
+        ManchesterPlayer surfaceView = findViewById(R.id.surfaceView);
+        //todo FilterType前一个Activity传进来
+        surfaceView.setFilterType(FilterType.OPPOSITE_COLOR.getFilterType());
 
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override

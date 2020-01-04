@@ -44,8 +44,9 @@ GLuint initShader(const char *source, GLint type) {
     return sh;
 }
 
-bool XShader::Init(XShaderType shaderType) {
+bool XShader::Init(XShaderType shaderType, int filterType) {
     Close();
+    this->filterType = filterType;
     const std::lock_guard<std::mutex> lock(mutex);
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
@@ -56,19 +57,15 @@ bool XShader::Init(XShaderType shaderType) {
     LOGDT("XShader initShader GL_VERTEX_SHADER success");
     switch (shaderType) {
         case XSHDER_YUV420P:
-            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
-            // fsh = initShader(fragYUV420PFilter, GL_FRAGMENT_SHADER);
+            getShaderForYuv420p(filterType);
             break;
         case XSHDER_NV12:
-         //   fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
-            fsh = initShader(fragNV21Gray, GL_FRAGMENT_SHADER);
+            getShaderForNV12(filterType);
             break;
         case XSHDER_NV21:
-         //   fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
-            fsh = initShader(fragNV12Gray, GL_FRAGMENT_SHADER);
+            getShaderForNV21(filterType);
             break;
         default:
-            //  mutex.unlock();
             LOGDT("XShaderType is error");
             return false;
     }
@@ -81,7 +78,6 @@ bool XShader::Init(XShaderType shaderType) {
     //创建渲染程序
     program = glCreateProgram();
     if (program == 0) {
-        //   mutex.unlock();
         LOGDT("XShader glCreateProgram failed");
         return false;
     }
@@ -146,6 +142,48 @@ bool XShader::Init(XShaderType shaderType) {
 
     LOGDT("XShader 初始化Shader成功");
     return true;
+}
+
+void XShader::getShaderForNV21(int filterType) {
+    switch (filterType) {
+        case OPPOSITE_COLOR:
+            fsh = initShader(fragNV21OppoColor, GL_FRAGMENT_SHADER);
+            break;
+        case GRAY:
+            fsh = initShader(fragNV21Gray, GL_FRAGMENT_SHADER);
+            break;
+        default:
+            fsh = initShader(fragNV21, GL_FRAGMENT_SHADER);
+            break;
+    }
+}
+
+void XShader::getShaderForNV12(int filterType) {
+    switch (filterType) {
+        case OPPOSITE_COLOR:
+            fsh = initShader(fragNV12OppoColor, GL_FRAGMENT_SHADER);
+            break;
+        case GRAY:
+            fsh = initShader(fragNV12Gray, GL_FRAGMENT_SHADER);
+            break;
+        default:
+            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
+            break;
+    }
+}
+
+void XShader::getShaderForYuv420p(int filterType) {
+    switch (filterType) {
+        case OPPOSITE_COLOR:
+            fsh = initShader(fragYUV420POppositeColor, GL_FRAGMENT_SHADER);
+            break;
+        case GRAY:
+            fsh = initShader(fragYUV420PGray, GL_FRAGMENT_SHADER);
+            break;
+        default:
+            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
+            break;
+    }
 }
 
 /**
