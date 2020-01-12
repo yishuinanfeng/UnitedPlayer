@@ -3,6 +3,7 @@ package com.man.manchesterunitedplayer.playlist
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import com.haha.record.getVideoParentPath
 import java.io.File
@@ -16,6 +17,7 @@ import com.man.manchesterunitedplayer.PlayActivity
 import com.man.manchesterunitedplayer.R
 import kotlinx.android.synthetic.main.activity_play_list.*
 import java.io.FileOutputStream
+import java.lang.RuntimeException
 
 
 enum class FilterType(val filterType: Int) {
@@ -80,6 +82,8 @@ class PlayListActivity : Activity() {
     }
 
     private fun getVideoThumb(videoPath: String): Bitmap {
-        return ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MICRO_KIND)
+        val Thumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MICRO_KIND)
+                ?: BitmapFactory.decodeResource(resources, R.mipmap.ic_defualt_video)
+        return Thumbnail
     }
 }

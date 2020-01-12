@@ -46,7 +46,6 @@ public class VideoActivity extends AppCompatActivity {
         finish = false;
         btnRecord.setText("正在录制");
         //准备写入数据
-        startRecord();
         if (mediaEncodec == null) {
             Log.d("ywl5320", "textureid is " + cameraView.getTextureId());
             try {
@@ -78,6 +77,7 @@ public class VideoActivity extends AppCompatActivity {
                 Log.d(TAG, "IOException is : " + e);
             }
         }
+        startRecord();
     }
 
     private void stop() {
