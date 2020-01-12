@@ -260,6 +260,7 @@ void XShader::Draw(int pts) {
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+
 }
 
 void XShader::Close() {

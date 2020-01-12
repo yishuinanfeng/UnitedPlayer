@@ -19,6 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer, View.OnClickListener {
     private static final String TAG = ManchesterPlayer.class.getSimpleName();
     private int filterType = -1;
+    private String videoPath;
 
     public ManchesterPlayer(Context context) {
         super(context);
@@ -34,6 +35,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG,"surfaceCreated");
         initView(holder.getSurface(),filterType);
+        open(videoPath);
     }
 
     @Override
@@ -72,6 +74,12 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
         this.filterType = filterType;
     }
 
+    public void setVideoPath(String videoPath) {
+        this.videoPath = videoPath;
+    }
+
     private native void pausePlay();
+
+    private native void open(String url);
 
 }

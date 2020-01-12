@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.haha.record.VideoActivity;
+import com.man.manchesterunitedplayer.playlist.PlayListActivity;
 
 public class MainActivity extends Activity {
 
@@ -16,7 +17,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.tv_play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,PlayActivity.class);
+                Intent intent = new Intent(MainActivity.this, PlayListActivity.class);
                 startActivity(intent);
             }
         });

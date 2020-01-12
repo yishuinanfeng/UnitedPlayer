@@ -25,7 +25,7 @@ Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobje
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_man_manchesterunitedplayer_OpenUrlActivity_open(JNIEnv *env, jobject thiz, jstring url) {
+Java_com_man_manchesterunitedplayer_ManchesterPlayer_open(JNIEnv *env, jobject thiz, jstring url) {
     // TODO: implement open()
     const char *openUrl = env->GetStringUTFChars(url, 0);
     IPlayerProxy::Get()->Open(openUrl);

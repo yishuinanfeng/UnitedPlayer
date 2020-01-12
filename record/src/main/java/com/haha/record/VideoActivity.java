@@ -17,6 +17,12 @@ import com.ywl5320.listener.OnCompleteListener;
 import com.ywl5320.listener.OnPreparedListener;
 import com.ywl5320.listener.OnShowPcmDataListener;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * 视频录制界面
  */
@@ -30,6 +36,7 @@ public class VideoActivity extends AppCompatActivity {
     //提供音乐
     private WlMusic wlMusic;
     private boolean finish = false;
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
 
     static {
         System.loadLibrary("record-lib");
@@ -42,18 +49,34 @@ public class VideoActivity extends AppCompatActivity {
         startRecord();
         if (mediaEncodec == null) {
             Log.d("ywl5320", "textureid is " + cameraView.getTextureId());
-            mediaEncodec = new MediaEncoder(VideoActivity.this, cameraView.getTextureId());
-            mediaEncodec.initEncoder(cameraView.getEglContext(),
-                    Environment.getExternalStorageDirectory().getAbsolutePath() + "/manlian.mp4"
-                    , 720, 1280, 44100);
-            mediaEncodec.setOnMediaInfoListener(new BaseMediaEncoder.OnMediaInfoListener() {
-                @Override
-                public void onMediaTime(long times) {
-                    Log.d(TAG, "time is : " + times);
+            try {
+                File parent = new File(ConfigKt.getVideoParentPath());
+                if (!parent.exists()) {
+                    parent.mkdirs();
                 }
-            });
+                String videoPath = ConfigKt.getVideoParentPath() + "/video" + simpleDateFormat.format(new Date())
+                        + ".mp4";
+                File file = new File(videoPath);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
 
-            mediaEncodec.startRecord();
+                mediaEncodec = new MediaEncoder(VideoActivity.this, cameraView.getTextureId());
+                mediaEncodec.initEncoder(cameraView.getEglContext(), videoPath
+
+                        , 720, 1280, 44100);
+                mediaEncodec.setOnMediaInfoListener(new BaseMediaEncoder.OnMediaInfoListener() {
+                    @Override
+                    public void onMediaTime(long times) {
+                        Log.d(TAG, "time is : " + times);
+                    }
+                });
+
+                mediaEncodec.startRecord();
+
+            } catch (IOException e) {
+                Log.d(TAG, "IOException is : " + e);
+            }
         }
     }
 
@@ -75,7 +98,7 @@ public class VideoActivity extends AppCompatActivity {
         if (finish) {
             return;
         }
-        Log.d("OpenSlDemo", "onPcmDataInput pcmData size:${pcmData.size}");
+        Log.d("OpenSlDemo", "onPcmDataInput pcmData size:" + pcmData.length);
         if (mediaEncodec != null) {
             mediaEncodec.putPcmData(pcmData, pcmData.length);
         }

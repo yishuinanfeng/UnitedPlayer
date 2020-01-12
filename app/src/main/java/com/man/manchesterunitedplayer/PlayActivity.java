@@ -2,13 +2,16 @@ package com.man.manchesterunitedplayer;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.SeekBar;
+
+import com.man.manchesterunitedplayer.playlist.FilterType;
+
+import static com.man.manchesterunitedplayer.KeyKt.KEY_INTENT_VIDEO_PATH;
+
 
 /**
  * 播放界面
@@ -29,9 +32,12 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_play);
 
+        String videoPath = getIntent().getStringExtra(KEY_INTENT_VIDEO_PATH);
+
         ManchesterPlayer surfaceView = findViewById(R.id.surfaceView);
         //todo FilterType前一个Activity传进来
         surfaceView.setFilterType(FilterType.OPPOSITE_COLOR.getFilterType());
+        surfaceView.setVideoPath(videoPath);
 
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +57,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
 
     @Override
     public void run() {
+        //轮询当前播放进度
         for (; ; ) {
             int pos = (int) (getPlayPos() * seekBar.getMax());
             if (pos == 0){
@@ -92,5 +99,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     }
 
     private native void seek(double position);
+
+
 }
 
