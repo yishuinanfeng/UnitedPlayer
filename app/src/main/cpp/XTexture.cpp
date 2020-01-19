@@ -74,7 +74,8 @@ public:
      * @param screenWidth
      * @param screenHeight
      */
-    virtual void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) {//分别算出屏幕和视频宽高比
+    virtual void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) {
+        //分别算出屏幕和视频宽高比
         float screenDimensionRatio = screenWidth * 1.0F / screenHeight;
         float videoDimensionRatio = videoWidth * 1.0F / videoHeight;
 
