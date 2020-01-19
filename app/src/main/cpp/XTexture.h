@@ -23,6 +23,8 @@ public:
     //todo 这里使用virtual是因为父类指针delete的时候没有virtual是调用不到该析构函数的
     virtual ~XTexture(){};
 
+    virtual void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) = 0;
+
 protected:
     XTexture(){};
 };

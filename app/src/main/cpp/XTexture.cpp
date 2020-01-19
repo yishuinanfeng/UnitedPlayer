@@ -15,12 +15,10 @@ public:
     std::mutex mutex;
 
     virtual void Drop() {
-        //  mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
         XEGL::Get()->Close();
         xShader.Close();
-        //   mutex.unlock();
-        //todo 相当于调用析构函数？
+
         delete this;
     }
 
@@ -43,9 +41,8 @@ public:
         return isInit;
     }
 
-    virtual void
-    Draw(unsigned char *data[], int videoWidth, int videoHeight, int pts, int screenWidth,
-         int screenHeight) {
+    virtual void Draw(unsigned char *data[], int videoWidth, int videoHeight, int pts, int screenWidth,
+                      int screenHeight) {
         //   mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
         adjustVideoDimension(videoWidth, videoHeight, screenWidth, screenHeight);
@@ -77,7 +74,7 @@ public:
      * @param screenWidth
      * @param screenHeight
      */
-    void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) const {//分别算出屏幕和视频宽高比
+    virtual void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) {//分别算出屏幕和视频宽高比
         float screenDimensionRatio = screenWidth * 1.0F / screenHeight;
         float videoDimensionRatio = videoWidth * 1.0F / videoHeight;
 
@@ -95,7 +92,7 @@ public:
             actualVideoWidth = static_cast<GLsizei>(videoWidth * ratio);
 
             int halfScreenWidth = screenWidth / 2;
-            viewPortX = halfScreenWidth - videoWidth / 2;
+            viewPortX = halfScreenWidth - actualVideoWidth / 2;
             viewPortY = 0;
         } else {
             //屏幕宽高比小于视频宽高比，视频填充宽度
@@ -104,10 +101,10 @@ public:
             actualVideoWidth = screenWidth;
 
             int halfScreenHeight = screenHeight / 2;
-            viewPortX = halfScreenHeight - videoHeight / 2;
-            viewPortY = 0;
+            viewPortY = halfScreenHeight - actualVideoHeight / 2;
+            viewPortX = 0;
         }
-
+        //todo 是否有必要每帧都需要设置视口？
         glViewport(viewPortX, viewPortY, actualVideoWidth, actualVideoHeight);
         LOG_VIDEO_DIMENSION("Draw：width:%d,height:%d", actualVideoWidth, actualVideoHeight);
     }

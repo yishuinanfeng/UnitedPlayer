@@ -37,7 +37,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated");
-        initView(holder.getSurface(), filterType, MachineUtilKt.getScreenWidth(getContext()), MachineUtilKt.getScreenHeight(getContext()));
+        initView(holder.getSurface(), filterType, getWidth(), getHeight());
         open(videoPath);
     }
 
