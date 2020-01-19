@@ -118,7 +118,7 @@ public:
         }
 
         LOGD("eglCreateContext success");
-        //将egl和opengl关联
+        //将egl和opengl关联,上下文绑定当前线程（这里是UI线程）
         //todo 两个surface一个读一个写。第二个一般用来离线渲染？
         if (EGL_TRUE != eglMakeCurrent(display, eglSurface, eglSurface, eglContext)) {
             LOGD("eglMakeCurrent failed");

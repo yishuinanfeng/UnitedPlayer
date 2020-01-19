@@ -21,11 +21,16 @@ public:
 
     virtual void setFilterType(int filterType);
 
+    virtual void setScreenDimension(int width,int height);
+
+
 protected:
     void *view = 0;
     XTexture *xTexture = 0;
     std::mutex mutex1;
     int filterType = -1;
+    int screenWidth = 0;
+    int screenHeight = 0;
 };
 
 

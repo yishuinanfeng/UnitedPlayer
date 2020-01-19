@@ -21,7 +21,7 @@ public:
 
     virtual bool Start();
 
-    virtual bool InitView(void *win, int filterType);
+    virtual bool InitView(void *win, int filterType,int screenWidth, int screenHeight);
 
     virtual double GetPlayPose();
 

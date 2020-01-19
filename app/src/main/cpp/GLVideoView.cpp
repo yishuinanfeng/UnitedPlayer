@@ -15,8 +15,8 @@ void GLVideoView::Render(XData xData) {
         xTexture = XTexture::Create();
         xTexture->Init(view, static_cast<XTextureType>(xData.format), filterType);
     }
-    xTexture->Draw(xData.datas, xData.width, xData.height, xData.pts);
-    LOG_VIDEO_DIMENSION("xData.width:%d, xData.height:%d",xData.width, xData.height);
+    xTexture->Draw(xData.datas, xData.width, xData.height, xData.pts, screenWidth, screenHeight);
+    LOG_VIDEO_DIMENSION("xData.width:%d, xData.height:%d", xData.width, xData.height);
 }
 
 void GLVideoView::SetRender(void *win) {
@@ -34,4 +34,9 @@ void GLVideoView::Close() {
 
 void GLVideoView::setFilterType(int filterType) {
     this->filterType = filterType;
+}
+
+void GLVideoView::setScreenDimension(int width, int height) {
+    this->screenWidth = width;
+    this->screenHeight = height;
 }

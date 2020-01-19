@@ -16,6 +16,7 @@ public:
     virtual void Update(XData xData);
     virtual void Close() = 0;
     virtual void setFilterType(int surfaceType) = 0;
+    virtual void setScreenDimension(int width,int height) = 0;
 };
 
 

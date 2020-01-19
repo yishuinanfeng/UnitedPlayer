@@ -1,6 +1,7 @@
 package com.man.manchesterunitedplayer;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -8,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
+
+import com.man.manchesterunitedplayer.util.MachineUtilKt;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -33,36 +36,36 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG,"surfaceCreated");
-        initView(holder.getSurface(),filterType);
+        Log.d(TAG, "surfaceCreated");
+        initView(holder.getSurface(), filterType, MachineUtilKt.getScreenWidth(getContext()), MachineUtilKt.getScreenHeight(getContext()));
         open(videoPath);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(TAG,"surfaceDestroyed");
+        Log.d(TAG, "surfaceDestroyed");
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        Log.d(TAG,"surfaceChanged");
+        Log.d(TAG, "surfaceChanged");
     }
 
-    public native void initView(Surface holderSurface, int surface);
+    public native void initView(Surface holderSurface, int surface, int screenWidth, int screenHeight);
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-        Log.d(TAG,"Renderer onSurfaceCreated");
+        Log.d(TAG, "Renderer onSurfaceCreated");
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-        Log.d(TAG,"Renderer onSurfaceChanged");
+        Log.d(TAG, "Renderer onSurfaceChanged");
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        Log.d(TAG,"Renderer onDrawFrame");
+        Log.d(TAG, "Renderer onDrawFrame");
     }
 
     @Override

@@ -41,12 +41,12 @@ bool IPlayerProxy::Start() {
     return result;
 }
 
-bool IPlayerProxy::InitView(void *win, int filterType) {
+bool IPlayerProxy::InitView(void *win, int filterType, int screenWidth, int screenHeight) {
     bool result = false;
 
     const std::lock_guard<std::mutex> lock(mutexProxy);
     if (player) {
-        result = player->InitView(win, filterType);
+        result = player->InitView(win, filterType, screenWidth, screenHeight);
     }
 
     return result;
@@ -85,7 +85,7 @@ bool IPlayerProxy::Seek(double position) {
     bool re = false;
 
     const std::lock_guard<std::mutex> lock(mutexProxy);
-    if (player){
+    if (player) {
         re = player->Seek(position);
     }
 
@@ -95,7 +95,7 @@ bool IPlayerProxy::Seek(double position) {
 void IPlayerProxy::SetPause(bool isP) {
 
     const std::lock_guard<std::mutex> lock(mutexProxy);
-    if (player){
+    if (player) {
         player->SetPause(isP);
     }
 
@@ -105,7 +105,7 @@ bool IPlayerProxy::IsPause() {
     bool re = false;
 
     const std::lock_guard<std::mutex> lock(mutexProxy);
-    if (player){
+    if (player) {
         re = player->IsPause();
     }
 

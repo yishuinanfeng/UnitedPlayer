@@ -18,9 +18,10 @@ jint JNI_OnLoad(JavaVM *vm, void *res) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_ManchesterPlayer_initView(JNIEnv *env, jobject thiz,
-                                                              jobject surface,jint filterType) {
+                                                              jobject surface, jint filterType,
+                                                              jint screenWidth, jint screenHeight) {
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
-    IPlayerProxy::Get()->InitView(win, filterType);
+    IPlayerProxy::Get()->InitView(win, filterType, screenWidth, screenHeight);
 }
 
 extern "C"

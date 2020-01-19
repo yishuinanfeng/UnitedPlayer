@@ -2,6 +2,7 @@
 // Created by yanxi on 2019/9/15.
 //
 
+#include <GLES2/gl2.h>
 #include "XTexture.h"
 #include "XEGL.h"
 #include "XLog.h"
@@ -14,11 +15,11 @@ public:
     std::mutex mutex;
 
     virtual void Drop() {
-      //  mutex.lock();
+        //  mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
         XEGL::Get()->Close();
         xShader.Close();
-     //   mutex.unlock();
+        //   mutex.unlock();
         //todo 相当于调用析构函数？
         delete this;
     }
@@ -38,28 +39,77 @@ public:
 
         LOGE("Init xShader");
         bool isInit = xShader.Init(static_cast<XShaderType>(type), filterType);
-    //    mutex.unlock();
+        //    mutex.unlock();
         return isInit;
     }
 
-    virtual void Draw(unsigned char *data[], int width, int height, int pts) {
-     //   mutex.lock();
+    virtual void
+    Draw(unsigned char *data[], int videoWidth, int videoHeight, int pts, int screenWidth,
+         int screenHeight) {
+        //   mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
-        xShader.GetTexture(0, width, height, data[0]);//Y
+        adjustVideoDimension(videoWidth, videoHeight, screenWidth, screenHeight);
+
+        xShader.GetTexture(0, videoWidth, videoHeight, data[0]);//Y
         LOGDT("GetTexture data y:%d:", *data[0]);
         if (type == XTEXTURE_YUV420P) {
-            xShader.GetTexture(1, width / 2, height / 2, data[1]);//U
+            xShader.GetTexture(1, videoWidth / 2, videoHeight / 2, data[1]);//U
             LOGDT("GetTexture data u:%d:", *data[1]);
-            xShader.GetTexture(2, width / 2, height / 2, data[2]);//V
+            xShader.GetTexture(2, videoWidth / 2, videoHeight / 2, data[2]);//V
             LOGDT("GetTexture data v:%d:", *data[2]);
         } else {
             //NV12和NV21解码出来为Y和UV两个数组
-            xShader.GetTexture(1, width / 2, height / 2, data[1], true);//UV
+            xShader.GetTexture(1, videoWidth / 2, videoHeight / 2, data[1], true);//UV
         }
 
         xShader.Draw(pts);
         XEGL::Get()->Draw();
-   //     mutex.unlock();
+    }
+
+    /**
+     * 视频尺寸适配屏幕
+     * 适配策略（类似ImageView的fitCenter效果）：
+     * 1.屏幕宽高比大于视频宽高比，视频填充高度
+     * 2.屏幕宽高比小于视频宽高比，视频填充宽度
+     *
+     * @param videoWidth
+     * @param videoHeight
+     * @param screenWidth
+     * @param screenHeight
+     */
+    void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) const {//分别算出屏幕和视频宽高比
+        float screenDimensionRatio = screenWidth * 1.0F / screenHeight;
+        float videoDimensionRatio = videoWidth * 1.0F / videoHeight;
+
+        //视口的视频左下角点
+        int viewPortX;
+        int viewPortY;
+
+        GLsizei actualVideoHeight;
+        GLsizei actualVideoWidth;
+
+        if (screenDimensionRatio > videoDimensionRatio) {
+            //屏幕宽高比大于视频宽高比，视频填充高度
+            float ratio = screenHeight * 1.0F / videoHeight;
+            actualVideoHeight = screenHeight;
+            actualVideoWidth = static_cast<GLsizei>(videoWidth * ratio);
+
+            int halfScreenWidth = screenWidth / 2;
+            viewPortX = halfScreenWidth - videoWidth / 2;
+            viewPortY = 0;
+        } else {
+            //屏幕宽高比小于视频宽高比，视频填充宽度
+            float ratio = screenWidth * 1.0F / videoWidth;
+            actualVideoHeight = static_cast<GLsizei>(videoHeight * ratio);
+            actualVideoWidth = screenWidth;
+
+            int halfScreenHeight = screenHeight / 2;
+            viewPortX = halfScreenHeight - videoHeight / 2;
+            viewPortY = 0;
+        }
+
+        glViewport(viewPortX, viewPortY, actualVideoWidth, actualVideoHeight);
+        LOG_VIDEO_DIMENSION("Draw：width:%d,height:%d", actualVideoWidth, actualVideoHeight);
     }
 };
 

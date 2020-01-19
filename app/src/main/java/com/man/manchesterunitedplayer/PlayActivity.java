@@ -36,7 +36,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
 
         ManchesterPlayer surfaceView = findViewById(R.id.surfaceView);
         //todo FilterType前一个Activity传进来
-        surfaceView.setFilterType(FilterType.OPPOSITE_COLOR.getFilterType());
+       // surfaceView.setFilterType(FilterType.OPPOSITE_COLOR.getFilterType());
         surfaceView.setVideoPath(videoPath);
 
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {

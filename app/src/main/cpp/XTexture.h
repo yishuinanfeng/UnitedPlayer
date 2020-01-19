@@ -17,7 +17,7 @@ public:
 
     virtual bool Init(void *win, XTextureType textureType, int i) = 0;
 
-    virtual void Draw(unsigned char *data[], int width, int height, int i) = 0;
+    virtual void Draw(unsigned char *data[], int videoWidth, int videoHeight, int filterType, int screenWidth, int screenHeight) = 0;
 
     virtual void Drop() = 0;
     //todo 这里使用virtual是因为父类指针delete的时候没有virtual是调用不到该析构函数的

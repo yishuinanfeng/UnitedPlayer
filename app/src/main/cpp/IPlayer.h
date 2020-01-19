@@ -37,7 +37,7 @@ public:
 
     virtual bool Start();
 
-    virtual bool InitView(void *win, int filterType);
+    virtual bool InitView(void *win, int filterType,int screenWidth, int screenHeight);
 
     //获取当前进度（0.0--1.0）
     virtual double GetPlayPose();
