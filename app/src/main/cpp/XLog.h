@@ -16,7 +16,7 @@ class XLog {
 #include <android/log.h>
 //#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
 //#define LOGDT(...) __android_log_print(ANDROID_LOG_DEBUG,"texture",__VA_ARGS__)
-//#define LOGDSHADER(...) __android_log_print(ANDROID_LOG_DEBUG,"shader",__VA_ARGS__)
+#define LOGDSHADER(...) __android_log_print(ANDROID_LOG_DEBUG,"shader",__VA_ARGS__)
 //#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"ManchesterUnitedPlayerDemo",__VA_ARGS__)
 //#define LOGA(...) __android_log_print(ANDROID_LOG_ERROR,"SLAudioPlay",__VA_ARGS__)
@@ -30,7 +30,7 @@ class XLog {
 #define LOGA(...) ""
 #define LOGS(...) ""
 #define LOGLOCK(...) ""
-#define LOGDSHADER(...) ""
+//#define LOGDSHADER(...) ""
 #define LOG_VIDEO_DIMENSION(...) __android_log_print(ANDROID_LOG_INFO,"VIDEO_DIMENSION",__VA_ARGS__)
 //#define LOGLOCK(...) ""
 #else

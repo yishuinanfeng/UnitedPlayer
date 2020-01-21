@@ -3,7 +3,7 @@
 //
 
 #include "GLVideoView.h"
-#include "XTexture.h"
+#include "TextureHandler.h"
 #include "XLog.h"
 
 void GLVideoView::Render(XData xData) {
@@ -12,7 +12,7 @@ void GLVideoView::Render(XData xData) {
         return;
     }
     if (!xTexture) {
-        xTexture = XTexture::Create();
+        xTexture = TextureHandler::Create();
         xTexture->Init(view, static_cast<XTextureType>(xData.format), filterType);
     }
     xTexture->Draw(xData.datas, xData.width, xData.height, xData.pts, screenWidth, screenHeight);

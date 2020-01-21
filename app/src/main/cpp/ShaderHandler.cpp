@@ -2,10 +2,13 @@
 // Created by yanxi on 2019/9/15.
 //
 
-#include "XShader.h"
+#include "ShaderHandler.h"
 #include "XLog.h"
 #include "IPlayer.h"
-#include "Shader.h"
+#include "FragmentShader.h"
+#include "OppoFilter.h"
+#include "GrayFilter.h"
+#include "NoneFilter.h"
 #include <GLES2/gl2.h>
 #include <ctime>
 
@@ -15,10 +18,10 @@ GLuint initShader(const char *source, GLint type) {
     //创建shader
     GLuint sh = glCreateShader(type);
     if (sh == 0) {
-        LOGDT("glCreateShader %d failed", type);
+        LOGDSHADER("glCreateShader %d failed", type);
         return 0;
     }
-    LOGDT("GetTexture initShader:%s:", source);
+    LOGDSHADER("loadTexture initShader:%s:", source);
     //加载shader
     glShaderSource(sh,
                    1,//shader数量
@@ -44,41 +47,46 @@ GLuint initShader(const char *source, GLint type) {
     return sh;
 }
 
-bool XShader::Init(XShaderType shaderType, int filterType) {
+bool ShaderHandler::Init(YuvType yuvType, int filterType) {
     Close();
     this->filterType = filterType;
     const std::lock_guard<std::mutex> lock(mutex);
     vsh = initShader(vertexShader, GL_VERTEX_SHADER);
     if (vsh == 0) {
-        //   mutex.unlock();
-        LOGDT("XShader initShader GL_VERTEX_SHADER failed");
+        LOGDSHADER("ShaderHandler initShader GL_VERTEX_SHADER failed");
         return false;
     }
-    LOGDT("XShader initShader GL_VERTEX_SHADER success");
-    switch (shaderType) {
-        case XSHDER_YUV420P:
-            getShaderForYuv420p(filterType);
+    LOGDSHADER("ShaderHandler initShader GL_VERTEX_SHADER success");
+
+    switch (filterType) {
+        case OPPOSITE_COLOR:
+            filter = new OppoFilter();
+            LOGDSHADER("OppoFilter");
             break;
-        case XSHDER_NV12:
-            getShaderForNV12(filterType);
-            break;
-        case XSHDER_NV21:
-            getShaderForNV21(filterType);
+        case GRAY:
+            filter = new GrayFilter();
+            LOGDSHADER("GrayFilter");
             break;
         default:
-            LOGDT("XShaderType is error");
-            return false;
+            filter = new NoneFilter();
+            LOGDSHADER("NoneFilter");
+            break;
     }
+
+    LOGDSHADER("getFragmentShader");
+
+    fsh = filter->getFragmentShader(yuvType);
+
     if (fsh == 0) {
-        LOGDT("XShader initShader GL_FRAGMENT_SHADER failed");
+        LOGDSHADER("ShaderHandler initShader GL_FRAGMENT_SHADER failed");
         return false;
     }
-    LOGDT("XShader initShader GL_FRAGMENT_SHADER success");
+    LOGDSHADER("ShaderHandler initShader GL_FRAGMENT_SHADER success");
 
     //创建渲染程序
     program = glCreateProgram();
     if (program == 0) {
-        LOGDT("XShader glCreateProgram failed");
+        LOGDSHADER("ShaderHandler glCreateProgram failed");
         return false;
     }
 
@@ -91,10 +99,10 @@ bool XShader::Init(XShaderType shaderType, int filterType) {
     GLint status = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
     if (status != GL_TRUE) {
-        LOGDT("XShader glLinkProgram failed");
+        LOGDT("ShaderHandler glLinkProgram failed");
         return false;
     }
-    LOGDT("XShader glLinkProgram success");
+    LOGDT("ShaderHandler glLinkProgram success");
     //激活渲染程序
     glUseProgram(program);
 
@@ -121,69 +129,29 @@ bool XShader::Init(XShaderType shaderType, int filterType) {
     glEnableVertexAttribArray(aTex);
     glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, 8, fragment);
 
-    uTimeId = glGetUniformLocation(program, "u_time");
+    //uTimeId = glGetUniformLocation(program, "u_time");
+
+    filter->onShaderDataLoad();
 
     //纹理初始化
     //设置纹理层
-
+    //todo 这里是指定各个sampler2D变量对应哪一层纹理？
     glUniform1i(glGetUniformLocation(program, "yTexture"), 0);
-    switch (shaderType) {
-        case XSHDER_YUV420P:
+    switch (yuvType) {
+        case SHADER_YUV420P:
             glUniform1i(glGetUniformLocation(program, "uTexture"), 1);
             glUniform1i(glGetUniformLocation(program, "vTexture"), 2);
             break;
-        case XSHDER_NV12:
-        case XSHDER_NV21:
-            //NV12,NV21只需要两层纹理（因为数据只有数组？）
+            //NV12,NV21只需要两层纹理
+        case SHADER_NV12:
+        case SHADER_NV21:
             glUniform1i(glGetUniformLocation(program, "uvTexture"), 1);
             break;
 
     }
 
-    LOGDT("XShader 初始化Shader成功");
+    LOGDT("ShaderHandler 初始化Shader成功");
     return true;
-}
-
-void XShader::getShaderForNV21(int filterType) {
-    switch (filterType) {
-        case OPPOSITE_COLOR:
-            fsh = initShader(fragNV21OppoColor, GL_FRAGMENT_SHADER);
-            break;
-        case GRAY:
-            fsh = initShader(fragNV21Gray, GL_FRAGMENT_SHADER);
-            break;
-        default:
-            fsh = initShader(fragNV21, GL_FRAGMENT_SHADER);
-            break;
-    }
-}
-
-void XShader::getShaderForNV12(int filterType) {
-    switch (filterType) {
-        case OPPOSITE_COLOR:
-            fsh = initShader(fragNV12OppoColor, GL_FRAGMENT_SHADER);
-            break;
-        case GRAY:
-            fsh = initShader(fragNV12Gray, GL_FRAGMENT_SHADER);
-            break;
-        default:
-            fsh = initShader(fragNV12, GL_FRAGMENT_SHADER);
-            break;
-    }
-}
-
-void XShader::getShaderForYuv420p(int filterType) {
-    switch (filterType) {
-        case OPPOSITE_COLOR:
-            fsh = initShader(fragYUV420POppositeColor, GL_FRAGMENT_SHADER);
-            break;
-        case GRAY:
-            fsh = initShader(fragYUV420PGray, GL_FRAGMENT_SHADER);
-            break;
-        default:
-            fsh = initShader(fragYUV420P, GL_FRAGMENT_SHADER);
-            break;
-    }
 }
 
 /**
@@ -193,11 +161,11 @@ void XShader::getShaderForYuv420p(int filterType) {
  * @param height
  * @param buf
  */
-void XShader::GetTexture(unsigned int index, int width, int height, unsigned char *buf, bool isA) {
-    // LOGD("XShader GetTexture width:%d,,height:%d,buf:%x" ,width ,height,buf);
+void ShaderHandler::loadTexture(unsigned int index, int width, int height, unsigned char *buf, bool isAlpha) {
+    // LOGD("ShaderHandler loadTexture width:%d,,height:%d,buf:%x" ,width ,height,buf);
     //gpu内部格式 亮度，灰度图（这里就是按照亮度值存储纹理单元 ，只取一个亮度的颜色通道的意思），格式默认为灰度
     unsigned int format = GL_LUMINANCE;
-    if (isA) {
+    if (isAlpha) {
         //带透明通道，按照亮度和alpha值存储纹理单元
         format = GL_LUMINANCE_ALPHA;
     }
@@ -206,7 +174,7 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
 
     if (textures[index] == 0) {
         glGenTextures(1, &textures[index]);
-        //LOGD("XShader GetTexture texture id:%d:",text[index]);
+        //LOGD("ShaderHandler loadTexture texture id:%d:",text[index]);
         //绑定纹理。后面的的设置和加载全部作用于当前绑定的纹理对象
         //GL_TEXTURE0、GL_TEXTURE1、GL_TEXTURE2 的就是纹理单元，GL_TEXTURE_1D、GL_TEXTURE_2D、CUBE_MAP为纹理目标
         //通过 glBindTexture 函数将纹理目标和纹理绑定后，对纹理目标所进行的操作都反映到对纹理上
@@ -230,14 +198,14 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
                      nullptr //纹理的数据（先不传）
         );
     }
-    //  LOGD("XShader glActiveTexture");
+    //  LOGD("ShaderHandler glActiveTexture");
     //激活第一层纹理，绑定到创建的纹理
     //下面的width,height主要是显示尺寸？
     glActiveTexture(GL_TEXTURE0 + index);
     //绑定纹理
     glBindTexture(GL_TEXTURE_2D, textures[index]);
     //替换纹理，比重新使用glTexImage2D性能高多
-    LOGDT("GetTexture width:%d, height:%d", width, height);
+    LOGDT("loadTexture width:%d, height:%d", width, height);
     glTexSubImage2D(GL_TEXTURE_2D, 0,
                     0, 0,//相对原来的纹理的offset
                     width, height,//加载的纹理宽度、高度。最好为2的次幂
@@ -246,24 +214,26 @@ void XShader::GetTexture(unsigned int index, int width, int height, unsigned cha
 
 }
 
-void XShader::Draw(int pts) {
+void ShaderHandler::Draw(int pts) {
 
     const std::lock_guard<std::mutex> lock(mutex);
 
     if (!program) {
-
         return;
     }
     LOGE("xShader Draw");
 
-    glUniform1f(uTimeId, pts);
+    // glUniform1f(uTimeId, pts);
+
+    filter->onDraw();
+
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 
 }
 
-void XShader::Close() {
+void ShaderHandler::Close() {
     const std::lock_guard<std::mutex> lock(mutex);
 
     //要先释放program，如果先释放shader的话程序还会访问shader，导致出错？

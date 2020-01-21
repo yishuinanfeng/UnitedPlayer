@@ -260,7 +260,7 @@ bool IPlayer::Seek(double position) {
 }
 
 void IPlayer::SetPause(bool isP) {
-    //   mutex.lock();
+
     const std::lock_guard<std::mutex> lock(mutex);
 
     XThread::SetPause(isP);
@@ -277,7 +277,7 @@ void IPlayer::SetPause(bool isP) {
         LOGS("audioPlay->SetPause:");
         audioPlay->SetPause(isP);
     }
-    //  mutex.unlock();
+
 }
 
 

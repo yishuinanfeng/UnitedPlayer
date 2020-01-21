@@ -2,8 +2,8 @@
 // Created by yanyinan on 2020/1/4.
 //
 
-#ifndef MANCHESTERUNITEDPLAYER_SHADER_H
-#define MANCHESTERUNITEDPLAYER_SHADER_H
+#ifndef MANCHESTERUNITEDPLAYER_FRAGMENTSHADER_H
+#define MANCHESTERUNITEDPLAYER_FRAGMENTSHADER_H
 
 
 /**
@@ -91,7 +91,7 @@ static const char *fragYUV420POppositeColor = GET_STR(
 );
 
 /**
- * yuv420p反色 shader
+ * yuv420p灰度shader
  */
 static const char *fragYUV420PGray = GET_STR(
         precision
@@ -367,4 +367,4 @@ static const char *fragNV21Gray = GET_STR(
 );
 
 
-#endif //MANCHESTERUNITEDPLAYER_SHADER_H
+#endif //MANCHESTERUNITEDPLAYER_FRAGMENTSHADER_H

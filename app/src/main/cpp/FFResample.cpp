@@ -27,11 +27,11 @@ bool FFResample::Open(XParameter in, XParameter out) {
                                     p->sample_rate, 0, 0);
     int re = swr_init(swrContext);
     if (re != 0) {
-        LOGE("swr init fail");
+        LOGE("swr onShaderDataLoad fail");
    //     mutex1.unlock();
         return false;
     }
-    LOGD("swr init success");
+    LOGD("swr onShaderDataLoad success");
     outChannels = p->channels;
     outFormat = AV_SAMPLE_FMT_S16;
   //  mutex1.unlock();

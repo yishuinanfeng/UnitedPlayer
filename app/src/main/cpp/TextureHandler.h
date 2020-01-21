@@ -2,8 +2,8 @@
 // Created by yanxi on 2019/9/15.
 //
 
-#ifndef MANCHESTERUNITEDPLAYER_XTEXTURE_H
-#define MANCHESTERUNITEDPLAYER_XTEXTURE_H
+#ifndef MANCHESTERUNITEDPLAYER_TEXTUREHANDLER_H
+#define MANCHESTERUNITEDPLAYER_TEXTUREHANDLER_H
 
 enum XTextureType {
     XTEXTURE_YUV420P = 0,//每4个像素Y4 U1 V1  (测试中是软解码结果的格式)
@@ -11,9 +11,9 @@ enum XTextureType {
     XTEXTURE_NV21 = 26 //每4个像素Y4 VU1
 };
 
-class XTexture {
+class TextureHandler {
 public:
-    static XTexture *Create();
+    static TextureHandler *Create();
 
     virtual bool Init(void *win, XTextureType textureType, int i) = 0;
 
@@ -21,13 +21,13 @@ public:
 
     virtual void Drop() = 0;
     //todo 这里使用virtual是因为父类指针delete的时候没有virtual是调用不到该析构函数的
-    virtual ~XTexture(){};
+    virtual ~TextureHandler(){};
 
     virtual void adjustVideoDimension(int videoWidth, int videoHeight, int screenWidth, int screenHeight) = 0;
 
 protected:
-    XTexture(){};
+    TextureHandler(){};
 };
 
 
-#endif //MANCHESTERUNITEDPLAYER_XTEXTURE_H
+#endif //MANCHESTERUNITEDPLAYER_TEXTUREHANDLER_H

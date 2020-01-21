@@ -9,7 +9,7 @@
 #include "XData.h"
 #include "IVideoView.h"
 
-class XTexture;
+class TextureHandler;
 
 class GLVideoView : public IVideoView {
 public:
@@ -26,7 +26,7 @@ public:
 
 protected:
     void *view = 0;
-    XTexture *xTexture = 0;
+    TextureHandler *xTexture = 0;
     std::mutex mutex1;
     int filterType = -1;
     int screenWidth = 0;

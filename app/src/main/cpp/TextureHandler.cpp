@@ -3,14 +3,14 @@
 //
 
 #include <GLES2/gl2.h>
-#include "XTexture.h"
+#include "TextureHandler.h"
 #include "XEGL.h"
 #include "XLog.h"
-#include "XShader.h"
+#include "ShaderHandler.h"
 
-class CXTexture : public XTexture {
+class CTextureHandler : public TextureHandler {
 public:
-    XShader xShader;
+    ShaderHandler xShader;
     XTextureType type;
     std::mutex mutex;
 
@@ -29,14 +29,14 @@ public:
         xShader.Close();
         this->type = textureType;
         if (!win) {
-            LOGE("CXTexture win is NULL！");
+            LOGE("CTextureHandler win is NULL！");
         }
         if (!XEGL::Get()->Init(win)) {
             return false;
         }
 
         LOGE("Init xShader");
-        bool isInit = xShader.Init(static_cast<XShaderType>(type), filterType);
+        bool isInit = xShader.Init(static_cast<YuvType>(type), filterType);
         //    mutex.unlock();
         return isInit;
     }
@@ -47,16 +47,16 @@ public:
         const std::lock_guard<std::mutex> lock(mutex);
         adjustVideoDimension(videoWidth, videoHeight, screenWidth, screenHeight);
 
-        xShader.GetTexture(0, videoWidth, videoHeight, data[0]);//Y
-        LOGDT("GetTexture data y:%d:", *data[0]);
+        xShader.loadTexture(0, videoWidth, videoHeight, data[0]);//Y
+        LOGDT("loadTexture data y:%d:", *data[0]);
         if (type == XTEXTURE_YUV420P) {
-            xShader.GetTexture(1, videoWidth / 2, videoHeight / 2, data[1]);//U
-            LOGDT("GetTexture data u:%d:", *data[1]);
-            xShader.GetTexture(2, videoWidth / 2, videoHeight / 2, data[2]);//V
-            LOGDT("GetTexture data v:%d:", *data[2]);
+            xShader.loadTexture(1, videoWidth / 2, videoHeight / 2, data[1]);//U
+            LOGDT("loadTexture data u:%d:", *data[1]);
+            xShader.loadTexture(2, videoWidth / 2, videoHeight / 2, data[2]);//V
+            LOGDT("loadTexture data v:%d:", *data[2]);
         } else {
             //NV12和NV21解码出来为Y和UV两个数组
-            xShader.GetTexture(1, videoWidth / 2, videoHeight / 2, data[1], true);//UV
+            xShader.loadTexture(1, videoWidth / 2, videoHeight / 2, data[1], true);//UV
         }
 
         xShader.Draw(pts);
@@ -111,8 +111,8 @@ public:
     }
 };
 
-XTexture *XTexture::Create() {
-    return new CXTexture();
+TextureHandler *TextureHandler::Create() {
+    return new CTextureHandler();
 }
 
 

@@ -49,9 +49,9 @@ add_library( # Sets the name of the library.
         XParameter.cpp
         GLVideoView.cpp
         IVideoView.cpp
-        XTexture.cpp
+        TextureHandler.cpp
         XEGL.cpp
-        XShader.cpp
+        ShaderHandler.cpp
         IResample.cpp
         FFResample.cpp
         IAudioPlay.cpp
@@ -60,6 +60,10 @@ add_library( # Sets the name of the library.
         IPlayBuilder.cpp
         FFPlayBuilder.cpp
         IPlayerProxy.cpp
+        Filter.cpp
+        NoneFilter.cpp
+        OppoFilter.cpp
+        GrayFilter.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a
