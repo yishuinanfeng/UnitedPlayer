@@ -394,6 +394,8 @@ static const char *fragYUV420PSplash = GET_STR(
                     0.0, -0.39465, 2.03211,
                     1.13983, -0.5806, 0.0
             ) * yuv;
+            //除以1.3是为了减小变化的幅度，使得不出现一段时间的全白色。减0.2是为了给原始颜色画面提供停留的时间
+            //因为这里的time单位为毫秒，所以要除以一个比较大的数才可以保持一个肉眼可见的闪动效果
             float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
             if (uAdditionalColor < 0.0){
                 uAdditionalColor = 0.0;
@@ -402,7 +404,9 @@ static const char *fragYUV420PSplash = GET_STR(
         }
 );
 
-
+/**
+ * NV21闪白
+ */
 static const char *fragNV21Splash = GET_STR(
         precision
         mediump float;
@@ -429,6 +433,7 @@ static const char *fragNV21Splash = GET_STR(
             ) * yuv;
 
             //除以1.3是为了减小变化的幅度，使得不出现一段时间的全白色。减0.2是为了给原始颜色画面提供停留的时间
+            //因为这里的time单位为毫秒，所以要除以一个比较大的数才可以保持一个肉眼可见的闪动效果
             float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
             if (uAdditionalColor < 0.0){
                 uAdditionalColor = 0.0;
@@ -470,6 +475,7 @@ static const char *fragNV12Splash = GET_STR(
                     1.13983, -0.5806, 0.0
             ) * yuv;
             //除以1.3是为了减小变化的幅度，使得不出现一段时间的全白色。减0.2是为了给原始颜色画面提供停留的时间
+            //因为这里的time单位为毫秒，所以要除以一个比较大的数才可以保持一个肉眼可见的闪动效果
             float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
             if (uAdditionalColor < 0.0){
                 uAdditionalColor = 0.0;
