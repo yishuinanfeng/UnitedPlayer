@@ -21,6 +21,7 @@ enum FilterType {
     OPPOSITE_COLOR = 1,//反色
     GRAY = 2, //灰度图
     SPLASH = 3, //闪白
+    SCALE = 4, //闪白
 };
 /**
  * 着色器处理器
@@ -47,6 +48,7 @@ public:
     std::mutex mutex;
     //todo 动态滤镜的时间参数
     int uTimeLocation = 0;
+    int uScaleMatrixLocation;
     int filterType = -1;
 
 private:

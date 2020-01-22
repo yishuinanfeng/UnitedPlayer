@@ -19,11 +19,11 @@ const char *OppoFilter::getSpecifiedFragShader(int yuvType) {
 
 }
 
-void OppoFilter::onDraw() {
+void OppoFilter::onDraw(int i) {
 
 }
 
-void OppoFilter::onShaderDataLoad() {
+void OppoFilter::onShaderDataLoad(unsigned int i) {
 
 }
 

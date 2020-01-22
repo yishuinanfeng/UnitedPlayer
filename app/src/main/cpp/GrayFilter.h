@@ -15,9 +15,9 @@ class GrayFilter: public Filter {
 
     virtual const char *getSpecifiedFragShader(int yuvType);
 
-    virtual void onDraw();
+    virtual void onDraw(int i);
 
-    virtual void onShaderDataLoad();
+    virtual void onShaderDataLoad(unsigned int i);
 };
 
 

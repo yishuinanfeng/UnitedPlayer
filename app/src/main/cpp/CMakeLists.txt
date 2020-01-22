@@ -6,6 +6,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 #设置头文件路径（相对本文件路径）
 include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/glm)
+include_directories(${CMAKE_SOURCE_DIR}/glm/glm)
+
 
 #设置ffmpeg库所在路径的变量
 set(FF ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
@@ -65,6 +68,7 @@ add_library( # Sets the name of the library.
         OppoFilter.cpp
         GrayFilter.cpp
         SplashFilter.cpp
+        ScaleFilter.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a

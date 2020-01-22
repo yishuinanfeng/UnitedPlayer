@@ -12,6 +12,12 @@
 #include "SplashFilter.h"
 #include <GLES2/gl2.h>
 #include <ctime>
+#include "glm/glm/gtc/matrix_transform.hpp"
+#include "glm/glm/ext.hpp"
+#include "glm/glm/detail/_noise.hpp"
+#include "ScaleFilter.h"
+
+using namespace glm;
 
 GLuint initShader(const char *source, int type);
 
@@ -72,6 +78,10 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
             filter = new SplashFilter();
             LOGDSHADER("SplashFilter");
             break;
+        case SCALE:
+            filter = new ScaleFilter();
+            LOGDSHADER("ScaleFilter");
+            break;
         default:
             filter = new NoneFilter();
             LOGDSHADER("NoneFilter");
@@ -125,17 +135,21 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
 
     //加入纹理坐标数据
     static float fragment[] = {
-            1.0f, 0.0f,
-            0.0f, 0.0f,
-            1.0f, 1.0f,
-            0.0f, 1.0f
+            1.0F, 0.0F,
+            0.0F, 0.0F,
+            1.0F, 1.0F,
+            0.0F, 1.0F
     };
     GLuint aTex = static_cast<GLuint>(glGetAttribLocation(program, "aTextCoord"));
     glEnableVertexAttribArray(aTex);
     glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, 8, fragment);
 
     uTimeLocation = glGetUniformLocation(program, "u_time");
-    filter->onShaderDataLoad();
+    uScaleMatrixLocation = glGetUniformLocation(program, "uScaleMatrix");
+    mat4 scaleMatrix;
+    glUniformMatrix4fv(uScaleMatrixLocation, 1, GL_FALSE, glm::value_ptr(scaleMatrix));
+
+    filter->onShaderDataLoad(program);
 
     //纹理初始化
     //设置纹理层
@@ -229,7 +243,7 @@ void ShaderHandler::Draw(int pts) {
 
     glUniform1f(uTimeLocation, pts);
 
-    filter->onDraw();
+    filter->onDraw(pts);
 
     //绘制矩形图像
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

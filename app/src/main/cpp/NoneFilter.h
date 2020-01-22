@@ -12,11 +12,11 @@
  */
 class NoneFilter : public Filter {
 
-    virtual void onDraw();
+    virtual void onDraw(int i);
 
     virtual const char *getSpecifiedFragShader(int yuvType);
 
-    virtual void onShaderDataLoad();
+    virtual void onShaderDataLoad(unsigned int i);
 };
 
 

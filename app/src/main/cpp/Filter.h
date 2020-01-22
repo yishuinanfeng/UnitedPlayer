@@ -8,6 +8,7 @@
 
 #include <GLES2/gl2.h>
 
+
 class Filter {
 public:
     /**
@@ -21,12 +22,12 @@ public:
     /**
      * 绘制的时候当前滤镜需要处理的逻辑
      */
-    virtual void onDraw() = 0;
+    virtual void onDraw(int pts) = 0;
 
     /**
      * 在纹理坐标加载之后（例如获取片段着色器的属性location）
      */
-    virtual void onShaderDataLoad() = 0;
+    virtual void onShaderDataLoad(unsigned int program) = 0;
 
     /**
      * 得到具体的片段着色器代码（子类具体实现）

@@ -7,7 +7,7 @@
 #include "FragmentShader.h"
 #include "XLog.h"
 
-void SplashFilter::onDraw() {
+void SplashFilter::onDraw(int i) {
 
 }
 
@@ -24,6 +24,6 @@ const char *SplashFilter::getSpecifiedFragShader(int yuvType) {
     }
 }
 
-void SplashFilter::onShaderDataLoad() {
+void SplashFilter::onShaderDataLoad(unsigned int i) {
 
 }

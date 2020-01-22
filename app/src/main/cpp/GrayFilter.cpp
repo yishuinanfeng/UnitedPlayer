@@ -17,10 +17,10 @@ const char *GrayFilter::getSpecifiedFragShader(int yuvType) {
     }
 }
 
-void GrayFilter::onDraw() {
+void GrayFilter::onDraw(int i) {
 
 }
 
-void GrayFilter::onShaderDataLoad() {
+void GrayFilter::onShaderDataLoad(unsigned int i) {
 
 }

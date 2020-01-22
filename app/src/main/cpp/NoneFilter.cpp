@@ -7,7 +7,7 @@
 #include "ShaderHandler.h"
 #include "XLog.h"
 
-void NoneFilter::onDraw() {
+void NoneFilter::onDraw(int i) {
 
 }
 
@@ -24,6 +24,6 @@ const char *NoneFilter::getSpecifiedFragShader(int yuvType) {
     }
 }
 
-void NoneFilter::onShaderDataLoad() {
+void NoneFilter::onShaderDataLoad(unsigned int i) {
 
 }
