@@ -21,23 +21,27 @@ const char *ScaleFilter::getSpecifiedFragShader(int yuvType) {
 
 void ScaleFilter::onDraw(int pts) {
     //一个缩放动画的持续时间
-    int scaleDuration = 500;
+    int scaleDuration = SCALE_DURATION;
     int remainder = pts % scaleDuration;
     LOGDSHADER("ScaleFilter onDraw remainder:%d", remainder);
     float ratio;
     //算出pts对scaleTime区取余的余数占scaleTime多少
-    if (remainder < 50){
+    if (remainder < 100){
         ratio = 1;
     }
     else if (remainder > scaleDuration / 2) {
         ratio = remainder * 1.0F / scaleDuration;
     } else {
-     //   ratio = static_cast<float>(pow((1.0F - remainder * 1.0F / scaleDuration), 2));
-        ratio = (1.0F - remainder * 1.0F / scaleDuration);
+        //缩小速度加速度增快
+        ratio = static_cast<float>(pow((1.0F - remainder * 1.0F / scaleDuration), 2));
+      //  ratio = (1.0F - remainder * 1.0F / scaleDuration);
     }
 
     //最大缩放倍数为3.0F
-    float scale = 3.0F * ratio;
+    float scale = MAX_SCALE * ratio;
+    if (scale <1){
+        scale = 1;
+    }
     LOGDSHADER("ScaleFilter onDraw scale:%f", scale);
     mat4 scaleMatrix;
     mat4 resultMatrix = glm::scale(scaleMatrix, vec3(scale));

@@ -14,6 +14,9 @@
 
 using namespace glm;
 
+#define SCALE_DURATION  600
+#define MAX_SCALE  3.0F
+
 class ScaleFilter : public Filter{
     virtual const char *getSpecifiedFragShader(int yuvType);
 
