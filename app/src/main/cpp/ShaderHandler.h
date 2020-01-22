@@ -20,6 +20,7 @@ enum YuvType {
 enum FilterType {
     OPPOSITE_COLOR = 1,//反色
     GRAY = 2, //灰度图
+    SPLASH = 3, //闪白
 };
 /**
  * 着色器处理器
@@ -45,7 +46,7 @@ public:
     unsigned int textures[100] = {0};
     std::mutex mutex;
     //todo 动态滤镜的时间参数
-    //int uTimeId = 0;
+    int uTimeLocation = 0;
     int filterType = -1;
 
 private:

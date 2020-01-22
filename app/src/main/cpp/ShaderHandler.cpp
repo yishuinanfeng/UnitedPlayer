@@ -9,6 +9,7 @@
 #include "OppoFilter.h"
 #include "GrayFilter.h"
 #include "NoneFilter.h"
+#include "SplashFilter.h"
 #include <GLES2/gl2.h>
 #include <ctime>
 
@@ -66,6 +67,10 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
         case GRAY:
             filter = new GrayFilter();
             LOGDSHADER("GrayFilter");
+            break;
+        case SPLASH:
+            filter = new SplashFilter();
+            LOGDSHADER("SplashFilter");
             break;
         default:
             filter = new NoneFilter();
@@ -129,8 +134,7 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
     glEnableVertexAttribArray(aTex);
     glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, 8, fragment);
 
-    //uTimeId = glGetUniformLocation(program, "u_time");
-
+    uTimeLocation = glGetUniformLocation(program, "u_time");
     filter->onShaderDataLoad();
 
     //纹理初始化
@@ -223,7 +227,7 @@ void ShaderHandler::Draw(int pts) {
     }
     LOGE("xShader Draw");
 
-    // glUniform1f(uTimeId, pts);
+    glUniform1f(uTimeLocation, pts);
 
     filter->onDraw();
 
@@ -253,6 +257,8 @@ void ShaderHandler::Close() {
         }
         textures[i] = 0;
     }
+
+    delete filter;
 
 }
 

@@ -366,5 +366,118 @@ static const char *fragNV21Gray = GET_STR(
         }
 );
 
+/**
+ * YUV420P闪白
+ */
+static const char *fragYUV420PSplash = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uTexture;
+        uniform
+        sampler2D vTexture;
+        varying float time;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uTexture, vTextCoord).r - 0.5;
+            yuv.b = texture2D(vTexture, vTextCoord).r - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+            float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
+            if (uAdditionalColor < 0.0){
+                uAdditionalColor = 0.0;
+            }
+            gl_FragColor = vec4(rgb.r + uAdditionalColor, rgb.g + uAdditionalColor, rgb.b + uAdditionalColor, 1.0);
+        }
+);
+
+
+static const char *fragNV21Splash = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uvTexture;
+        varying float time;
+
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uvTexture, vTextCoord).a - 0.5;
+            yuv.b = texture2D(uvTexture, vTextCoord).r - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+
+            //除以1.3是为了减小变化的幅度，使得不出现一段时间的全白色。减0.2是为了给原始颜色画面提供停留的时间
+            float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
+            if (uAdditionalColor < 0.0){
+                uAdditionalColor = 0.0;
+            }
+
+            gl_FragColor = vec4(rgb.r + uAdditionalColor, rgb.g + uAdditionalColor, rgb.b + uAdditionalColor, 1.0);
+        }
+);
+
+
+/**
+ * NV12闪白
+ */
+static const char *fragNV12Splash = GET_STR(
+        precision
+        mediump float;
+        varying
+        vec2 vTextCoord;
+        //输入的yuv三个纹理
+        uniform
+        sampler2D yTexture;
+        uniform
+        sampler2D uvTexture;
+        //修改这个值，可以控制曝光的程度
+        // uniform float uAdditionalColor;
+        varying float time;
+        void main() {
+            vec3 yuv;
+            vec3 rgb;
+            //分别取yuv各个分量的采样纹理（r表示？）
+            //这里texture2D(yTexture, vTextCoord).r取.g.b效果也是一样的
+            yuv.r = texture2D(yTexture, vTextCoord).r;
+            yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
+            //NV12会把V采样到a通道
+            yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
+            rgb = mat3(
+                    1.0, 1.0, 1.0,
+                    0.0, -0.39465, 2.03211,
+                    1.13983, -0.5806, 0.0
+            ) * yuv;
+            //除以1.3是为了减小变化的幅度，使得不出现一段时间的全白色。减0.2是为了给原始颜色画面提供停留的时间
+            float uAdditionalColor = abs(sin(time/200.0))/1.3 -0.2;
+            if (uAdditionalColor < 0.0){
+                uAdditionalColor = 0.0;
+            }
+
+            gl_FragColor = vec4(rgb.r + uAdditionalColor, rgb.g + uAdditionalColor, rgb.b + uAdditionalColor, 1.0);
+        }
+);
+
 
 #endif //MANCHESTERUNITEDPLAYER_FRAGMENTSHADER_H

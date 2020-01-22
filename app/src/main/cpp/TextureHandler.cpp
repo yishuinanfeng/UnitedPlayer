@@ -58,7 +58,7 @@ public:
             //NV12和NV21解码出来为Y和UV两个数组
             xShader.loadTexture(1, videoWidth / 2, videoHeight / 2, data[1], true);//UV
         }
-
+        LOGDSHADER("Draw pts:%d",pts);
         xShader.Draw(pts);
         XEGL::Get()->Draw();
     }

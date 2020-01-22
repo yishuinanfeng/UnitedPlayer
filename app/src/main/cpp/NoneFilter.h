@@ -7,7 +7,9 @@
 
 
 #include "Filter.h"
-
+/**
+ * 不带滤镜效果
+ */
 class NoneFilter : public Filter {
 
     virtual void onDraw();

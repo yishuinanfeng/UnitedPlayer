@@ -37,7 +37,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated");
-        initView(holder.getSurface(), 1, getWidth(), getHeight());
+        initView(holder.getSurface(), 3, getWidth(), getHeight());
         open(videoPath);
     }
 
@@ -51,7 +51,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
         Log.d(TAG, "surfaceChanged");
     }
 
-    public native void initView(Surface holderSurface, int surface, int screenWidth, int screenHeight);
+    public native void initView(Surface holderSurface, int filterType, int screenWidth, int screenHeight);
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
