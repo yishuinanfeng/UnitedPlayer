@@ -26,7 +26,7 @@ void ScaleFilter::onDraw(int pts) {
     LOGDSHADER("ScaleFilter onDraw remainder:%d", remainder);
     float ratio;
     //算出pts对scaleTime区取余的余数占scaleTime多少
-    if (remainder < 100){
+    if (remainder < SKIP_DURATION){
         ratio = 1;
     }
     else if (remainder > scaleDuration / 2) {
@@ -38,7 +38,7 @@ void ScaleFilter::onDraw(int pts) {
     }
 
     //最大缩放倍数为3.0F
-    float scale = MAX_SCALE * ratio;
+    float scale = MAX_DIFF_SCALE * ratio;
     if (scale <1){
         scale = 1;
     }
@@ -46,6 +46,9 @@ void ScaleFilter::onDraw(int pts) {
     mat4 scaleMatrix;
     mat4 resultMatrix = glm::scale(scaleMatrix, vec3(scale));
     glUniformMatrix4fv(uScaleMatrixLocation, 1, GL_FALSE, glm::value_ptr(resultMatrix));
+
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void ScaleFilter::onShaderDataLoad(unsigned int program) {

@@ -7,8 +7,9 @@
 #include "ShaderHandler.h"
 #include "XLog.h"
 
-void NoneFilter::onDraw(int i) {
-
+void NoneFilter::onDraw(int pts) {
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 const char *NoneFilter::getSpecifiedFragShader(int yuvType) {

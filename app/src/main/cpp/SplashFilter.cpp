@@ -7,8 +7,9 @@
 #include "FragmentShader.h"
 #include "XLog.h"
 
-void SplashFilter::onDraw(int i) {
-
+void SplashFilter::onDraw(int pts) {
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 const char *SplashFilter::getSpecifiedFragShader(int yuvType) {

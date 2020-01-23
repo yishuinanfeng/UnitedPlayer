@@ -15,9 +15,10 @@
 using namespace glm;
 
 #define SCALE_DURATION  600
-#define MAX_SCALE  3.0F
+#define SKIP_DURATION  100
+#define MAX_DIFF_SCALE  3.0F
 
-class ScaleFilter : public Filter{
+class ScaleFilter : public Filter {
     virtual const char *getSpecifiedFragShader(int yuvType);
 
     virtual void onDraw(int i);

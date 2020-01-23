@@ -22,6 +22,8 @@ enum FilterType {
     GRAY = 2, //灰度图
     SPLASH = 3, //闪白
     SCALE = 4, //闪白
+    SOUL = 5, //灵魂出窍
+    SHAKE = 6, //抖动
 };
 /**
  * 着色器处理器

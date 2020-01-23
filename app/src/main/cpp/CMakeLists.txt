@@ -69,6 +69,8 @@ add_library( # Sets the name of the library.
         GrayFilter.cpp
         SplashFilter.cpp
         ScaleFilter.cpp
+        SoulFilter.cpp
+        ShakeFilter.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a

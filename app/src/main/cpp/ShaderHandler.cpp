@@ -16,6 +16,8 @@
 #include "glm/glm/ext.hpp"
 #include "glm/glm/detail/_noise.hpp"
 #include "ScaleFilter.h"
+#include "SoulFilter.h"
+#include "ShakeFilter.h"
 
 using namespace glm;
 
@@ -82,6 +84,14 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
             filter = new ScaleFilter();
             LOGDSHADER("ScaleFilter");
             break;
+        case SOUL:
+            filter = new SoulFilter();
+            LOGDSHADER("SoulFilter");
+            break;
+        case SHAKE:
+            filter = new ShakeFilter();
+            LOGDSHADER("ShakeFilter");
+            break;
         default:
             filter = new NoneFilter();
             LOGDSHADER("NoneFilter");
@@ -146,6 +156,7 @@ bool ShaderHandler::Init(YuvType yuvType, int filterType) {
 
     uTimeLocation = glGetUniformLocation(program, "u_time");
     uScaleMatrixLocation = glGetUniformLocation(program, "uScaleMatrix");
+
     mat4 scaleMatrix;
     glUniformMatrix4fv(uScaleMatrixLocation, 1, GL_FALSE, glm::value_ptr(scaleMatrix));
 
@@ -240,14 +251,14 @@ void ShaderHandler::Draw(int pts) {
         return;
     }
     LOGE("xShader Draw");
+//因为这里是两个图层，所以开启混合模式
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
 
     glUniform1f(uTimeLocation, pts);
 
     filter->onDraw(pts);
-
-    //绘制矩形图像
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
+    //  glDisable(GL_BLEND);
 
 }
 

@@ -7,13 +7,15 @@
 
 
 #include "Filter.h"
-
+/**
+ * 闪白效果
+ */
 class SplashFilter: public Filter {
     virtual void onDraw(int i);
 
     virtual const char *getSpecifiedFragShader(int yuvType);
 
-    virtual void onShaderDataLoad(unsigned int i);
+    virtual void onShaderDataLoad(unsigned int program);
 };
 
 

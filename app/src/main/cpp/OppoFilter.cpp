@@ -19,8 +19,9 @@ const char *OppoFilter::getSpecifiedFragShader(int yuvType) {
 
 }
 
-void OppoFilter::onDraw(int i) {
-
+void OppoFilter::onDraw(int pts) {
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void OppoFilter::onShaderDataLoad(unsigned int i) {

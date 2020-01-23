@@ -17,8 +17,9 @@ const char *GrayFilter::getSpecifiedFragShader(int yuvType) {
     }
 }
 
-void GrayFilter::onDraw(int i) {
-
+void GrayFilter::onDraw(int pts) {
+    //绘制矩形图像
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void GrayFilter::onShaderDataLoad(unsigned int i) {
