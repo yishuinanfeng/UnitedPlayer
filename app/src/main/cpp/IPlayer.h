@@ -46,6 +46,8 @@ public:
 
     virtual void SetPause(bool isP);
 
+    virtual void setFilterType(int filterType);
+
 //protected:
     IDemux *iDemux = 0;
     IDecode *videoDecode = 0;

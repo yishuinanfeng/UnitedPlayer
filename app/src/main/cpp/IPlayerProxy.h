@@ -31,6 +31,8 @@ public:
 
     virtual bool IsPause();
 
+    virtual void setFilterType(int filterType);
+
 
 protected:
     IPlayerProxy();

@@ -280,4 +280,10 @@ void IPlayer::SetPause(bool isP) {
 
 }
 
+void IPlayer::setFilterType(int filterType) {
+    if (videoView) {
+        videoView->setFilterType(filterType);
+    }
+}
+
 

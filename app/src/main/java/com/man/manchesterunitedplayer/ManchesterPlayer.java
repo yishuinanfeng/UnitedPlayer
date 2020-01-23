@@ -37,7 +37,7 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated");
-        initView(holder.getSurface(), 6, getWidth(), getHeight());
+        initView(holder.getSurface(), filterType, getWidth(), getHeight());
         open(videoPath);
     }
 
@@ -51,7 +51,6 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
         Log.d(TAG, "surfaceChanged");
     }
 
-    public native void initView(Surface holderSurface, int filterType, int screenWidth, int screenHeight);
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
@@ -74,15 +73,20 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     }
 
     public void setFilterType(int filterType) {
-        this.filterType = filterType;
+        setFilter(filterType);
+        open(videoPath);
     }
 
     public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
     }
 
-    private native void pausePlay();
+    public native void initView(Surface holderSurface, int filterType, int screenWidth, int screenHeight);
+
+    public native void pausePlay();
 
     private native void open(String url);
+
+    private native void setFilter(int filterType);
 
 }

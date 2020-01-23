@@ -111,3 +111,9 @@ bool IPlayerProxy::IsPause() {
 
     return re;
 }
+
+void IPlayerProxy::setFilterType(int filterType) {
+    player->setFilterType(filterType);
+}
+
+
