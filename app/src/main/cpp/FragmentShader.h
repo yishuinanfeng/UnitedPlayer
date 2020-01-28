@@ -659,38 +659,63 @@ static const char *fragNV21Soul = GET_STR(
 static const char *fragNV12Soul = GET_STR(
         precision
         mediump float;
-        varying
-        vec2 vTextCoord;
-        //输入的yuv三个纹理
-        uniform
-        sampler2D yTexture;
-        uniform
-        sampler2D uvTexture;
-        uniform float uAlpha;
-        //修改这个值，可以控制曝光的程度
-        // uniform float uAdditionalColor;
+varying
+        vec2
+vTextCoord;
+//输入的yuv三个纹理
+uniform
+        sampler2D
+yTexture;
+uniform
+        sampler2D
+uvTexture;
+uniform float uAlpha;
+uniform float uScale;
 
-        void main() {
-            vec3 yuv;
-            vec3 rgb;
-            //分别取yuv各个分量的采样纹理（r表示？）
-            //这里texture2D(yTexture, vTextCoord).r取.g.b效果也是一样的
-            yuv.r = texture2D(yTexture, vTextCoord).r;
-            yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
-            //NV12会把V采样到a通道
-            yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
-            rgb = mat3(
-                    1.0, 1.0, 1.0,
-                    0.0, -0.39465, 2.03211,
-                    1.13983, -0.5806, 0.0
-            ) * yuv;
+void main() {
+    vec3 yuv;
+    vec3 frontYuv;
+    vec3 rgb;
+    vec3 frontRgb;
+    vec2 frontTextCoord = vTextCoord.xy;
+    //分别取yuv各个分量的采样纹理（r表示？）
+    //这里texture2D(yTexture, vTextCoord).r取.g.b效果也是一样的
+    yuv.r = texture2D(yTexture, vTextCoord).r;
+    yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
+    //NV12会把V采样到a通道
+    yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
+    rgb = mat3(
+            1.0, 1.0, 1.0,
+            0.0, -0.39465, 2.03211,
+            1.13983, -0.5806, 0.0
+    ) * yuv;
 
-            gl_FragColor = vec4(rgb, uAlpha);
-        }
+    // 将纹理坐标中心转成(0.0, 0.0)再做缩放
+    vec2 center = vec2(0.5, 0.5);
+    frontTextCoord = frontTextCoord - center;
+    frontTextCoord = frontTextCoord / uScale;
+    frontTextCoord = frontTextCoord + center;
+
+    frontYuv.r = texture2D(yTexture, frontTextCoord).r;
+    frontYuv.g = texture2D(uvTexture, frontTextCoord).r - 0.5;
+    //NV12会把V采样到a通道
+    frontYuv.b = texture2D(uvTexture, frontTextCoord).a - 0.5;
+    frontRgb = mat3(
+            1.0, 1.0, 1.0,
+            0.0, -0.39465, 2.03211,
+            1.13983, -0.5806, 0.0
+    ) * frontYuv;
+
+    //gl_FragColor = vec4(frontRgb, 1.0);
+
+    // 线性混合
+    gl_FragColor = mix(vec4(rgb, 1.0), vec4(frontRgb, 1.0), 1.0 - fract(uScale));
+}
+
 );
 
 /**
- * YUV420P抖动
+ * YUV420P抖动（todo 暂未完成）
  */
 static const char *fragYUV420PShake = GET_STR(
         precision
@@ -724,7 +749,7 @@ static const char *fragYUV420PShake = GET_STR(
 );
 
 /**
- * NV21抖动
+ * NV21抖动（todo 暂未完成）
  */
 static const char *fragNV21Shake = GET_STR(
         precision
@@ -799,7 +824,6 @@ static const char *fragNV12Shake = GET_STR(
             yuv.g = texture2D(uvTexture, vTextCoord).r - 0.5;
             //NV12会把V采样到a通道
             yuv.b = texture2D(uvTexture, vTextCoord).a - 0.5;
-
 
             yuvLeftTop.r = texture2D(yTexture, leftTopTexCoord).r;
             yuvLeftTop.g = texture2D(uvTexture, leftTopTexCoord).r - 0.5;

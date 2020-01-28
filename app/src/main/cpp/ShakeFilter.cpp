@@ -27,7 +27,7 @@ void ShakeFilter::onDraw(int pts) {
     mat4 scaleMatrix;
     mat4 resultMatrix = glm::scale(scaleMatrix, vec3(scale));
     glUniformMatrix4fv(uScaleMatrixLocation, 1, GL_FALSE, glm::value_ptr(resultMatrix));
-
+    //纹理坐标的偏移量只需要一个很小的值（因为纹理坐标是归一化的）
     float textureCoordOffset = 0.005F * ratio;
     LOGDSHADER("ScaleFilter onDraw textureCoordOffset:%f", textureCoordOffset);
     glUniform1f(uTextureCoordOffsetLocation,textureCoordOffset);

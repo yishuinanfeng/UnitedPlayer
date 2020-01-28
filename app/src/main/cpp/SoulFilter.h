@@ -8,8 +8,9 @@
 
 #include "Filter.h"
 
-#define SCALE_DURATION  600
-#define MAX_DIFF_SCALE  3.0F
+#define SCALE_DURATION  1000
+#define MAX_DIFF_SCALE  1.0F
+#define SKIP_DURATION  150
 
 using namespace glm;
 /**
@@ -23,7 +24,7 @@ class SoulFilter : public Filter{
     virtual void onShaderDataLoad(unsigned int i);
 
 private:
-    int uScaleMatrixLocation;
+    int uScaleLocation;
     int uTimeLocation;
     int uAlphaLocation = 0;
     int uFrontAlphaLocation = 0;

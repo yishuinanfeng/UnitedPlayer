@@ -37,7 +37,7 @@ class CustomCamera(private val context: Context) {
         parameter.flashMode = "off"
         parameter.previewFormat = ImageFormat.NV21
         parameter.setRecordingHint(true)
-        parameter.focusMode = Camera.Parameters.FOCUS_MODE_AUTO
+        parameter.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
 
         val cameraSupportSize = getFitSize(parameter.supportedPictureSizes)
         parameter.setPictureSize(cameraSupportSize.width,cameraSupportSize.height)
