@@ -1,8 +1,8 @@
 package com.man.manchesterunitedplayer;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.man.manchesterunitedplayer.bean.FilterBean;
-import com.man.manchesterunitedplayer.playlist.FilterType;
-import com.man.manchesterunitedplayer.util.MachineUtilKt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +43,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     private RecyclerView rvFilter;
     private boolean isFilterListShow;
     private ManchesterPlayer surfaceView;
-    private boolean isSeekThreadStop;
+    private boolean isPause;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -63,9 +61,15 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
 
         surfaceView = findViewById(R.id.surfaceView);
         surfaceView.setVideoPath(videoPath);
+        surfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleFilterList();
+            }
+        });
 
         seekBar = findViewById(R.id.progressBar);
-        tvFilter = findViewById(R.id.filter);
+        tvFilter = findViewById(R.id.btn_pause);
         rvFilter = findViewById(R.id.rv_filter);
 
         initFilterList();
@@ -74,7 +78,14 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
         tvFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleFilterList();
+                surfaceView.pausePlay();
+                isPause = !isPause;
+                if (isPause) {
+                    tvFilter.setText("播放");
+                } else {
+                    tvFilter.setText("暂停");
+                }
+
             }
         });
 
@@ -106,23 +117,70 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     private void toggleFilterList() {
         if (isFilterListShow) {
 
-            Log.d(TAG,"close filterList");
+            Log.d(TAG, "close filterList");
 
             ObjectAnimator objectAnimator = ObjectAnimator
-                    .ofFloat(rvFilter, "translationY", MachineUtilKt.dp2px(this, 80));
+                    .ofFloat(rvFilter, "translationY", rvFilter.getHeight());
             objectAnimator.setDuration(500);
+            objectAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    tvFilter.setVisibility(View.VISIBLE);
+                    seekBar.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
             objectAnimator.start();
 
             isFilterListShow = false;
+
+
         } else {
-            Log.d(TAG,"open filterList");
+            Log.d(TAG, "open filterList");
 
             ObjectAnimator objectAnimator = ObjectAnimator
-                    .ofFloat(rvFilter, "translationY",  0);
+                    .ofFloat(rvFilter, "translationY", 0);
             objectAnimator.setDuration(500);
+            objectAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    tvFilter.setVisibility(View.INVISIBLE);
+                    seekBar.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
             objectAnimator.start();
 
             isFilterListShow = true;
+
         }
     }
 
@@ -133,18 +191,29 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
         //轮询当前播放进度
         for (; ; ) {
             int pos = (int) (getPlayPos() * seekBar.getMax());
+            Log.d(TAG, "getPlayPos pos:" + pos);
+
             if (pos == 0) {
                 continue;
             }
-            seekBar.setProgress(pos);
-            if (isSeekThreadStop) {
-                break;
+
+            if (pos > 99) {
+                isPause = true;
+                tvFilter.setVisibility(View.INVISIBLE);
             }
+
+            if (isPause) {
+                continue;
+            }
+
+            seekBar.setProgress(pos);
+
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -166,6 +235,11 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        if (seekBar.getProgress() < 100) {
+            Log.d(TAG, "onStopTrackingTouch seekBar.getProgress():" + seekBar.getProgress());
+            isPause = false;
+            tvFilter.setVisibility(View.VISIBLE);
+        }
         seek((double) seekBar.getProgress() / (double) seekBar.getMax());
     }
 
@@ -173,14 +247,14 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     protected void onStop() {
         super.onStop();
         surfaceView.pausePlay();
-        isSeekThreadStop = true;
+        isPause = true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         surfaceView.pausePlay();
-        isSeekThreadStop = false;
+        isPause = false;
     }
 
     private native void seek(double position);

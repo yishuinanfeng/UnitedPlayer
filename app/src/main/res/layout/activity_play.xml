@@ -11,21 +11,21 @@
         android:id="@+id/surfaceView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/filter"
+        android:layout_marginBottom="6dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="6dp"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/filter"
+        android:id="@+id/btn_pause"
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
+        android:layout_height="40dp"
         android:layout_margin="6dp"
-        android:text="特效"
+        android:background="@drawable/bg_pause_btn"
+        android:text="暂停"
         android:textColor="@color/colorPrimary"
         android:textSize="16sp"
-        android:background="@drawable/bg_filter_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -35,15 +35,16 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/filter"
-        app:layout_constraintTop_toTopOf="@id/filter" />
+        app:layout_constraintStart_toEndOf="@+id/btn_pause"
+        app:layout_constraintTop_toTopOf="@id/btn_pause" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_filter"
         android:layout_width="0dp"
-        android:layout_height="80dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="50dp"
+        android:translationY="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

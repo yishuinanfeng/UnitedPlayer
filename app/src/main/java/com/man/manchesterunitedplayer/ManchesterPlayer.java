@@ -19,7 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
  * 播放控件
  * SurfaceHolder.Callback作用是通知代码窗口的状态
  */
-public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer, View.OnClickListener {
+public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Callback, GLSurfaceView.Renderer {
     private static final String TAG = ManchesterPlayer.class.getSimpleName();
     private int filterType = -1;
     private String videoPath;
@@ -31,7 +31,6 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     public ManchesterPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
         setRenderer(this);
-        setOnClickListener(this);
     }
 
     @Override
@@ -65,11 +64,6 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
     @Override
     public void onDrawFrame(GL10 gl10) {
         Log.d(TAG, "Renderer onDrawFrame");
-    }
-
-    @Override
-    public void onClick(View view) {
-        pausePlay();
     }
 
     public void setFilterType(int filterType) {
