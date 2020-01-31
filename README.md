@@ -20,21 +20,27 @@
    1. 反色：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/oppoColor.gif)
+   
    2. 灰度图：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/gray.gif)
+   
    3. 闪白：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/splash.gif)
+   
    4. 缩放：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/scale.gif)
+   
    5. 灵魂出窍：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/soul.gif)
+   
    6. 抖动：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/shake.gif)
+   
 
 5. 视频添加背景音乐。（待开发）
 
