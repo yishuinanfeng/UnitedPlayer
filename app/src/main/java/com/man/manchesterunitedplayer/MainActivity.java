@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.haha.record.VideoActivity;
+import com.haha.record.RecordActivity;
 import com.man.manchesterunitedplayer.playlist.PlayListActivity;
 
 public class MainActivity extends Activity {
@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.tv_record).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                Intent intent = new Intent(MainActivity.this, RecordActivity.class);
                 startActivity(intent);
             }
         });

@@ -100,7 +100,7 @@ void recordDataCallBack(short *pInt) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haha_record_VideoActivity_startRecord(JNIEnv *env, jobject thiz) {
+Java_com_haha_record_RecordActivity_startRecord(JNIEnv *env, jobject thiz) {
 
     env->GetJavaVM(&javaVM);
     mAGlobalObject = env->NewGlobalRef(thiz);
@@ -160,6 +160,6 @@ Java_com_haha_record_VideoActivity_startRecord(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haha_record_VideoActivity_stopRecord(JNIEnv *env, jobject thiz) {
+Java_com_haha_record_RecordActivity_stopRecord(JNIEnv *env, jobject thiz) {
     isFinish = true;
 }
