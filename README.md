@@ -18,17 +18,17 @@
 
 4. 视频添加仿抖音滤镜。（已经实现最基础的滤镜：反色、灰度图、闪白、缩放、灵魂出窍、抖动）
    1. 反色：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/oppoColor.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/oppoColor.gif)
    2. 灰度图：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/gray.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/gray.gif)
    3. 闪白：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/splash.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/splash.gif)
    4. 缩放：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/scale.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/scale.gif)
    5. 灵魂出窍：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/soul.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/soul.gif)
    6. 抖动：
-   ![image](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/shake.gif)
+   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/shake.gif)
 
 5. 视频添加背景音乐。（待开发）
 
