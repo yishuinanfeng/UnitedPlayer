@@ -4,9 +4,9 @@
 
 ## 基本技术实现点：
 
-使用Camera+OpenGL ES实时预览画面，使用OpenSl ES录制音频，通过MediaCodec将音视频封装为MP4格式。
+使用Camera+OpenGL ES实时预览画面，使用OpenSl ES录制音频，通过MediaCodec将音视频编码并封装为MP4格式。
 
-使用ffmpeg解复用、解码MP4文件，通过OpenGL ES渲染视频画面，并通过片段着色器提供不同的视频仿抖音滤镜效果。
+使用ffmpeg解复用、解码MP4文件，通过OpenGL ES渲染视频画面，OpenSl ES播放音频，并通过OpenGL片段着色器提供不同的视频仿抖音滤镜效果。
 
 ## 功能点：
 
