@@ -37,7 +37,7 @@
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/soul.gif)
    
-   6. 抖动：
+   6. 颜色偏移抖动：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/shake.gif)
    
