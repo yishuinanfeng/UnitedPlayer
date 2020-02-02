@@ -2,6 +2,8 @@
 
 **一个支持录制和播放音频视频的应用，录制的视频将在播放列表中显示，点击列表项即可播放，并可以选择不同仿抖音滤镜特效。**
 
+博客链接：https://blog.csdn.net/sinat_23092639/article/details/104142700
+
 ## 基本技术实现点：
 
 使用Camera+OpenGL ES实时预览画面，使用OpenSl ES录制音频，通过MediaCodec分别对音视频进行编码，并通过MediaMuxer将音视频封装为MP4格式。
