@@ -2,7 +2,7 @@
 
 **一个支持录制和播放音频视频的应用，录制的视频将在播放列表中显示，点击列表项即可播放，并可以选择不同仿抖音滤镜特效。**
 
-博客链接：https://blog.csdn.net/sinat_23092639/article/details/104142700
+博客链接：[介绍一个自己刚出炉的音视频播放录制开源项目](https://blog.csdn.net/sinat_23092639/article/details/104142700)
 
 ## 基本技术实现点：
 
@@ -13,8 +13,10 @@
 ## 功能点：
 
 1. 视频音频播放，支持进度条控制和暂停。（已完成）  
+  ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/play.jpg)
 
 2. 视频音频录制。（已完成）
+    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/record.jpg)
 
 3. 视频添加水印。（已经实现，待扩展）
 
