@@ -12,8 +12,10 @@
 
 ## 功能点：
 
-1. 视频音频播放，支持进度条控制和暂停。（已完成）  
-  ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/play.jpg)
+1. 视频音频播放，支持进度条控制和暂停。（已完成） 
+
+![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/playProgress.jpg)
+ 
 
 2. 视频音频录制。（已完成）
 
@@ -21,9 +23,13 @@
 
 3. 视频添加水印。（已经实现，待扩展）
 
-    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/playProgress.jpg)
+    
 
 4. 视频添加仿抖音滤镜。（已经实现最基础的滤镜：反色、灰度图、闪白、缩放、灵魂出窍、抖动）
+
+  ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/play.jpg)
+
+
    1. 反色：
    
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/oppoColor.gif)
