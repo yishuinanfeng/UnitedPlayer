@@ -12,20 +12,24 @@
 
 ## 功能点：
 
-1. 视频音频播放，支持进度条控制和暂停。（已完成） 
+### 视频音频播放，支持进度条控制和暂停。（已完成） 
 
 ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/playProgress.jpg)
  
 
-2. 视频音频录制。（已完成）
+### 视频音频录制。（已完成）
 
     ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/record.jpg)
 
-3. 视频添加水印。（已经实现，待扩展）
+### 音频视频同步。（已完成）
+
+### 视频尺寸自适应。（已完成）
+
+### 视频添加水印。（已经实现，待扩展）
 
     
 
-4. 视频添加仿抖音滤镜。（已经实现最基础的滤镜：反色、灰度图、闪白、缩放、灵魂出窍、抖动）
+### 视频添加仿抖音滤镜。（已经实现最基础的滤镜：反色、灰度图、闪白、缩放、灵魂出窍、抖动）
 
   ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/play.jpg)
 
@@ -55,13 +59,13 @@
    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/shake.gif)
    
 
-5. 视频添加背景音乐。（待开发）
+### 视频添加背景音乐。（待开发）
 
-6. 音频变调。（待开发）
+### 音频变调。（待开发）
 
-7. 视频断点续录。（待开发）
+### 视频断点续录。（待开发）
 
-8. 视频裁剪（待开发）
+### 视频裁剪（待开发）
 
 **当前项目只是实现了整体主要功能，用户交互方面还是比较粗糙，性能也没有专门进行优化过，以后应该还会不断优化和扩展功能~~**
 
