@@ -19,7 +19,7 @@
 
 ### 视频音频录制。（已完成）
 
-    ![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/record.jpg)
+![img](https://github.com/yishuinanfeng/UnitedPlayer/blob/master/gif/record.jpg)
 
 ### 音频视频同步。（已完成）
 
