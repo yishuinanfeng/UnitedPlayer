@@ -79,6 +79,8 @@ public class ManchesterPlayer extends GLSurfaceView implements SurfaceHolder.Cal
 
     public native void pausePlay();
 
+    public native void closePlay();
+
     private native void open(String url);
 
     private native void setFilter(int filterType);

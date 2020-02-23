@@ -221,6 +221,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        surfaceView.closePlay();
     }
 
     @Override

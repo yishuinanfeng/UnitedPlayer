@@ -59,4 +59,8 @@ JNIEXPORT void JNICALL
 Java_com_man_manchesterunitedplayer_ManchesterPlayer_pausePlay(JNIEnv *env, jobject thiz) {
     // TODO: implement pausePlay()
     IPlayerProxy::Get()->SetPause(!IPlayerProxy::Get()->IsPause());
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_man_manchesterunitedplayer_ManchesterPlayer_closePlay(JNIEnv *env, jobject thiz) {
+    IPlayerProxy::Get()->Close();
 }
