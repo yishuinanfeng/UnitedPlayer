@@ -19,8 +19,6 @@ void IDemux::Main() {
         } else{
             Sleep(10);
         }
-//        if(data.size == 0){
-//            break;
-//        }
+
     }
 }

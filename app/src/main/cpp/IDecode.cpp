@@ -15,19 +15,13 @@ void IDecode::Update(XData pkt) {
     LOGE("Update isAudio %d", isAudio);
     //如果队列满了，则不能添加元素，循环等待队列不满的时候再添加。阻塞队列的功能。
     while (!isExit) {
-        LOGLOCK("Update packsMutex.lock() start");
-        //    packsMutex.lock();
+
         const std::lock_guard<std::mutex> lock(packsMutex);
-        LOGLOCK("Update packsMutex.lock() end");
 
         if (packList.size() < packMaxCount) {
             packList.push_back(pkt);
-            //    packsMutex.unlock();
-            LOGLOCK("Update packsMutex.unlock()");
             break;
         }
-        //  packsMutex.unlock();
-        LOGLOCK("Update packsMutex.unlock()");
         //延时是为了防止不断循环将cpu耗尽
         Sleep(1);
     }
@@ -40,26 +34,21 @@ void IDecode::Main() {
     while (!isExit) {
         if (IsPause()) {
             LOGE("IDecode::Main Pause");
-            //    LOGLOCK("IsPause()");
             Sleep(2);
             continue;
         }
 
-
-        //  packsMutex.lock();
         //todo 这个加锁语句和clear中的加锁语句导致死锁
         {
-            LOGLOCK("Main packsMutex.lock() start");
             const std::lock_guard<std::mutex> lock(packsMutex);
-            LOGLOCK("Main packsMutex.lock() end");
 
             //音视频同步
             if (!isAudio && synPts > 0) {
+                LOGDecode("当前播放的音频帧时间戳：%d",synPts);
                 //如果正在播放的音频帧的pts小于的刚解码出来的视频帧pts，则等待直到播放的音频帧不小于再解码视频帧
                 //synPts为当前播放的音频帧pts
                 if (synPts < pts) {
-                    //  packsMutex.unlock();
-                    LOGLOCK("synPts < pts");
+                    LOGDecode("音频时间戳比视频慢");
                     LOGLOCK("Main packsMutex.unlock()1");
                     Sleep(1);
                     continue;

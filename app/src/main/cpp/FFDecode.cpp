@@ -30,6 +30,7 @@ bool FFDecode::Open(XParameter xParameter, bool isHard) {
     AVCodecParameters *p = xParameter.parameters;
     AVCodec *cd = avcodec_find_decoder(p->codec_id);
     if (isHard) {
+        //使用硬解码
         cd = avcodec_find_decoder_by_name("h264_mediacodec");
     }
     if (!cd) {
@@ -45,46 +46,41 @@ bool FFDecode::Open(XParameter xParameter, bool isHard) {
     //因为新的版本已经将AVStream结构体中的AVCodecContext字段定义为废弃属性，
     // 所以现在是通过AVCodecParameters获取AVCodecContext
     avcodec_parameters_to_context(codecContext, p);
-    //开8个线程
+    //开8个线程解码
     codecContext->thread_count = 8;
     //打开解码器
     int re = avcodec_open2(codecContext, 0, 0);
-    LOGI("avcodec_open2 success!");
+    LOGDecode("avcodec_open2 success!");
     if (re != 0) {
-        // mutex1.unlock();
-
         char buf[1024] = {0};
         av_strerror(re, buf, sizeof(buf) - 1);
-        LOGE("%s", buf);
+        LOGDecode("%s", buf);
         return false;
     }
 
     if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         this->isAudio = false;
-        LOGE("Open isAudio %d", false);
+        LOGDecode("Open isAudio %d", false);
     } else if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         this->isAudio = true;
-        LOGE("Open isAudio %d", true);
+        LOGDecode("Open isAudio %d", true);
     }
-    //   mutex1.unlock();
+
     return true;
 }
 
 bool FFDecode::SendPacket(XData pkt) {
-    //   mutex1.lock();
+
     const std::lock_guard<std::mutex> lock(mutex1);
 
     if (!codecContext) {
-        //     mutex1.unlock();
         return false;
     }
     if (pkt.size <= 0 || !pkt.data) {
-        //     mutex1.unlock();
         return false;
     }
     //发送到解码线程进行解码
     int re = avcodec_send_packet(codecContext, reinterpret_cast<const AVPacket *>(pkt.data));
-    //   mutex1.unlock();
     return re == 0;
 }
 
@@ -105,37 +101,38 @@ XData FFDecode::RecvFrame() {
     //得到解码之后的一帧，将avcodec_send_packet的一帧解码到avFrame
     int re = avcodec_receive_frame(codecContext, avFrame);
     if (re != 0) {
-        //    mutex1.unlock();
+        LOGDecode("解码一帧失败");
         return XData();
     }
+    LOGDecode("解码一帧成功");
     XData xData;
     //todo 直接强转？
     xData.data = reinterpret_cast<unsigned char *>(avFrame);
     if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
+        LOGDecode("视频帧处理");
         xData.size = (avFrame->linesize[0] + avFrame->linesize[1] + avFrame->linesize[2]) *
                      avFrame->height;
         xData.width = avFrame->width;
         xData.height = avFrame->height;
     } else if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
+        LOGDecode("音频帧处理");
         //样本字节数*样本数*声道数
         xData.size = av_get_bytes_per_sample(static_cast<AVSampleFormat>(avFrame->format)) *
                      avFrame->nb_samples * 2;
     }
     xData.format = avFrame->format;
     if (!isAudio) {
-        LOG_VIDEO_DIMENSION("video format:%d", xData.format);
-        LOGD("data format is %d", avFrame->format);
+        LOGDecode("video format:%d", xData.format);
+        LOGDecode("data format is %d", avFrame->format);
     }
     //将avFrame的具体音视频数据拷贝到xData.datas中（两个数组大小都是8）
     memcpy(xData.datas, avFrame->data, sizeof(xData.datas));
-    xData.pts = avFrame->pts;
-//    mutex1.unlock();
+    xData.pts = static_cast<int>(avFrame->pts);
     return xData;
 }
 
 void FFDecode::Close() {
     Clear();
-    //   mutex1.lock();
     const std::lock_guard<std::mutex> lock(mutex1);
 
     pts = 0;
@@ -147,7 +144,6 @@ void FFDecode::Close() {
         avcodec_close(codecContext);
         avcodec_free_context(&codecContext);
     }
-    //   mutex1.unlock();
 }
 
 void FFDecode::Clear() {
@@ -161,6 +157,10 @@ void FFDecode::Clear() {
     }
     //  mutex1.unlock();
 
+}
+
+FFDecode::FFDecode() {
+    threadName = "FFDecode";
 }
 
 

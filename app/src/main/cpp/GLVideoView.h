@@ -23,6 +23,8 @@ public:
 
     virtual void setScreenDimension(int width,int height);
 
+    GLVideoView();
+
 
 protected:
     void *view = 0;

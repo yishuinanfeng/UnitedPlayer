@@ -41,18 +41,13 @@ bool IPlayer::Open(const char *path) {
     if (!resample || !resample->Open(iDemux->GetAudioParameter(), outPara)) {
         LOGE("resample open %s fail", path);
     }
-    //   mutex.unlock();
+
     return true;
 }
 
 bool IPlayer::Start() {
-
-    //    iDemux->Start();
-//    audioDecode->Start();
-//    videoDecode->Start();
-    //  mutex.lock();
     const std::lock_guard<std::mutex> lock(mutex);
-
+    //这里先start解码器再start解复用器是因为保证解复用后的帧都可以被解码
     if (audioPlay) {
         audioPlay->StartPlay(outPara);
     }
@@ -65,13 +60,10 @@ bool IPlayer::Start() {
 
     if (!iDemux || !iDemux->Start()) {
         LOGE("iDemux->Start fail");
-        //return都要unlock
-        //   mutex.unlock();
         return false;
     }
 
     XThread::Start();
-    //  mutex.unlock();
     return true;
 }
 
@@ -91,19 +83,18 @@ bool IPlayer::InitView(void *win, int filterType, int screenWidth, int screenHei
 
 void IPlayer::Main() {
     while (!isExit) {
-        //   mutex.lock();
         const std::lock_guard<std::mutex> lock(mutex);
 
         //在player中将当前音频player的当前帧的pts赋值给视频解码器
         if (!audioPlay || !videoDecode) {
-            //     mutex.unlock();
             continue;
         }
         //将当前音频帧pts赋值给视频解码器的synPts
         int apts = audioPlay->pst;
         videoDecode->synPts = apts;
+        LOGAudioPlayer("videoDecode->synPts = apts;apts：%d",apts);
         LOGD("apts = %d", apts);
-        //     mutex.unlock();
+
         Sleep(2);
     }
 

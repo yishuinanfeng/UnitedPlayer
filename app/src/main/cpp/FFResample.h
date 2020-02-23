@@ -14,6 +14,8 @@ public:
     virtual bool Open(XParameter in, XParameter out = XParameter());
     virtual void Close();
     virtual XData Resample(XData xData);
+
+    FFResample();
 protected:
     SwrContext *swrContext = 0;
     std::mutex mutex1;

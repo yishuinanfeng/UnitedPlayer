@@ -94,3 +94,7 @@ void FFResample::Close() {
     }
  //   mutex1.unlock();
 }
+
+FFResample::FFResample() {
+    threadName = "FFResample";
+}

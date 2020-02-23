@@ -50,6 +50,8 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
         System.loadLibrary("native-lib");
     }
 
+    private boolean isStopPlay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,6 +192,10 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     public void run() {
         //轮询当前播放进度
         for (; ; ) {
+            //todo 尝试不加break看性能指标
+            if (isStopPlay){
+                break;
+            }
             int pos = (int) (getPlayPos() * seekBar.getMax());
             Log.d(TAG, "getPlayPos pos:" + pos);
 
@@ -222,6 +228,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     protected void onDestroy() {
         super.onDestroy();
         surfaceView.closePlay();
+        isStopPlay = true;
     }
 
     @Override
@@ -247,6 +254,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d(TAG, "onStop pausePlay");
         surfaceView.pausePlay();
         isPause = true;
     }
@@ -254,6 +262,7 @@ public class PlayActivity extends Activity implements Runnable, SeekBar.OnSeekBa
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume pausePlay");
         surfaceView.pausePlay();
         isPause = false;
     }

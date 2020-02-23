@@ -5,6 +5,8 @@
 #ifndef MANCHESTERUNITEDPLAYER_XTHREAD_H
 #define MANCHESTERUNITEDPLAYER_XTHREAD_H
 
+#include <string>
+
 //线程sleep毫秒
 void Sleep(int mis);
 
@@ -25,9 +27,10 @@ public:
 
 
 protected:
+    char *threadName = nullptr;
     bool isExit = false;
     bool isRunnig = false;
-    bool isPause = false;
+    bool isPause = true;
     bool isPausing = false;
 private:
     void ThreadMain();

@@ -51,18 +51,11 @@ void XThread::ThreadMain() {
 }
 
 void XThread::SetPause(bool pause) {
+    //todo 这里c++是否存在多线程的可见性问题呢？
+    LOGXThread("SetPause pause:%d,threadName:%s",pause,threadName);
     isPause = pause;
-    //等待isPausing的变化，最多等待100毫秒
-//    for (int i = 0; i < 10; i++) {
-//        if (isPausing == isPause) {
-//            break;
-//        }
-//        Sleep(10);
-//    }
-
 }
 
 bool XThread::IsPause() {
-    //isPause;
     return isPause;
 }

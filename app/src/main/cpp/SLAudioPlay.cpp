@@ -179,6 +179,8 @@ bool SLAudioPlay::StartPlay(XParameter out) {
 }
 
 SLAudioPlay::SLAudioPlay() {
+    threadName = "SLAudioPlay";
+
     buf = new unsigned char[1024 * 1024];
 }
 

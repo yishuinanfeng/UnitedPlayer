@@ -40,3 +40,7 @@ void GLVideoView::setScreenDimension(int width, int height) {
     this->screenWidth = width;
     this->screenHeight = height;
 }
+
+GLVideoView::GLVideoView() {
+    threadName = "GLVideo";
+}

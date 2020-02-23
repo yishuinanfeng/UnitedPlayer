@@ -119,33 +119,39 @@ XData FFDemux::Read() {
     //从流中读取一帧，读入传入的AVPacket中
     int re = av_read_frame(ic, pkt);
     if (re != 0) {
-        //   mux.unlock();
+        LOGDemux("解复用读取一帧失败");
         av_packet_free(&pkt);
         return XData();
     }
+    LOGDemux("解复用读取一帧成功");
     LOGI("packet size:%d pts:%lld", pkt->size, pkt->pts);
 
     data.data = reinterpret_cast<unsigned char *>(pkt);
     data.size = pkt->size;
     if (pkt->stream_index == videoStreamIndex) {
+        LOGDemux("视频帧");
         data.isAudio = false;
     } else if (pkt->stream_index == audioStreamIndex) {
+        LOGDemux("音频帧");
         data.isAudio = true;
     } else {
-        //     mux.unlock();
         av_packet_free(&pkt);
         return XData();
     }
     //time_base单位为秒，这里转为毫秒
-    pkt->pts = pkt->pts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
-    pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
+    //播放时间戳
+    pkt->pts = static_cast<int64_t>(pkt->pts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base)));
+    //解码时间戳（对于视频的）
+    pkt->dts = static_cast<int64_t>(pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base)));
     data.pts = static_cast<int>(pkt->pts);
     LOGD("demux pts %d", data.pts);
-    //  mux.unlock();
+
     return data;
 }
 
 FFDemux::FFDemux() {
+    threadName = "FFDemux";
+
     static bool isFirst = true;
     if (isFirst) {
         isFirst = false;
@@ -160,12 +166,10 @@ FFDemux::FFDemux() {
 }
 
 void FFDemux::Close() {
-    //   mux.lock();
     const std::lock_guard<std::mutex> lock(mux);
     if (ic) {
         avformat_close_input(&ic);
     }
-    //   mux.unlock();
 }
 
 bool FFDemux::Seek(double position) {

@@ -31,6 +31,8 @@ public:
     //清空ffmpeg内部的解码缓冲队列
     virtual void Clear();
 
+    FFDecode();
+
 protected:
     AVCodecContext *codecContext = 0;
     AVFrame *avFrame = 0;
