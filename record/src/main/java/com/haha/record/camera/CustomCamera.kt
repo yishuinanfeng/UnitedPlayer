@@ -7,7 +7,9 @@ import android.hardware.Camera
 import android.util.Log
 import com.haha.record.util.DisplayUtil
 
-
+/**
+ * Camera包装类，包括对Camera的配置的预览启动、停止
+ */
 class CustomCamera(private val context: Context) {
 
     private val TAG = this::class.java.simpleName

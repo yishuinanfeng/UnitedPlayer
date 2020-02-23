@@ -8,6 +8,9 @@ import android.util.Log
 import android.view.WindowManager
 import com.haha.record.egl.CustomGlSurfaceView
 
+/**
+ * 专门用来给摄像头预览的GlSurfaceView
+ */
 class CameraPreviewView : CustomGlSurfaceView {
 
     private var textureId: Int = -1
@@ -35,8 +38,10 @@ class CameraPreviewView : CustomGlSurfaceView {
         previewAngle(ctx)
         cameraRender!!.onSurfaceCreatedListener = object : CameraRender.OnSurfaceCreatedListener {
             override fun onSurfadceCreated(surfaceTexture: SurfaceTexture, textureId: Int) {
+                //GLSurface创建完之后，和OpenGl纹理关联的surfaceTexture再和摄像头绑定
                 Log.e(TAG, "onSurfadceCreated")
                 customCamera?.initCamera(surfaceTexture, cameraId)
+                //纹理id保存在CameraPreviewView，随时提供给录制线程渲染使用
                 this@CameraPreviewView.textureId = textureId
             }
         }

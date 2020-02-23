@@ -105,7 +105,7 @@ open class CustomGlSurfaceView : SurfaceView, SurfaceHolder.Callback {
         var height: Int = 0
 
         override fun run() {
-            Log.d("CustomGlSurfaceView", "EglMediaThread run")
+            Log.d("CustomGlSurfaceView", "MediaRenderThread run")
             eglHelper = EglHelper()
             lock = Object()
             surfaceViewReference.get()?.let {

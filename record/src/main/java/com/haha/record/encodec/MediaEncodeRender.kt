@@ -13,6 +13,9 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
+/**
+ * 将摄像头预览数据渲染到MediaCode的surface中进行编码
+ */
 class MediaEncodeRender(val context: Context, private val textureId: Int) : CustomGlSurfaceView.CustomRender {
 
     private val projectionMatrix = FloatArray(16)

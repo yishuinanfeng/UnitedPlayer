@@ -44,7 +44,7 @@ open class BaseMediaEncoder(val context: Context) {
 
     private var mediaMuxer: MediaMuxer? = null
 
-    private var eglMediaThread: EglMediaThread? = null
+    private var mediaRenderThread: MediaRenderThread? = null
     private var videoEncodeThread: VideoEncodeThread? = null
     private var audioEncodeThread: AudioEncodeThread? = null
 
@@ -84,12 +84,12 @@ open class BaseMediaEncoder(val context: Context) {
         encodeStart = false
         audioPts = 0
 
-        eglMediaThread = EglMediaThread(WeakReference(this))
+        mediaRenderThread = MediaRenderThread(WeakReference(this))
         videoEncodeThread = VideoEncodeThread(WeakReference(this))
         audioEncodeThread = AudioEncodeThread(WeakReference(this))
-        eglMediaThread!!.isCreate = true
-        eglMediaThread!!.isChange = true
-        eglMediaThread!!.start()
+        mediaRenderThread!!.isCreate = true
+        mediaRenderThread!!.isChange = true
+        mediaRenderThread!!.start()
         videoEncodeThread!!.start()
         audioEncodeThread!!.start()
     }
@@ -97,11 +97,11 @@ open class BaseMediaEncoder(val context: Context) {
     fun stopRecord() {
         videoEncodeThread?.exit()
         audioEncodeThread?.exit()
-        eglMediaThread?.onDestroy()
+        mediaRenderThread?.onDestroy()
 
         videoEncodeThread = null
         audioEncodeThread = null
-        eglMediaThread = null
+        mediaRenderThread = null
     }
 
     /**
@@ -137,11 +137,11 @@ open class BaseMediaEncoder(val context: Context) {
     }
 
     fun initEncoder(
-        eglContext: EGLContext,
-        savePath: String,
-        width: Int,
-        height: Int,
-        sampleRate: Int = 44100
+            eglContext: EGLContext,
+            savePath: String,
+            width: Int,
+            height: Int,
+            sampleRate: Int = 44100
     ) {
         this.width = width
         this.height = height
@@ -202,7 +202,7 @@ open class BaseMediaEncoder(val context: Context) {
      * OpenGL渲染线程，向MediaCodec的输入Surface提供原始视频数据
      * 可以看作VideoEncodeThread的生产者
      */
-    class EglMediaThread(private val encodeReference: WeakReference<BaseMediaEncoder>) : Thread() {
+    class MediaRenderThread(private val encodeReference: WeakReference<BaseMediaEncoder>) : Thread() {
 
         private var eglHelper: EglHelper? = null
 
@@ -222,7 +222,9 @@ open class BaseMediaEncoder(val context: Context) {
                 if (it.mSurface == null) {
                     return
                 }
-                //该surface为MediaCodec的输入Surface，这里就将egl和MediaCodec绑定，使得渲染上去的数据作为编码的输入
+
+                //该surface为MediaCodec的输入Surface，这里将渲染的EglContext和录制的mSurface进行共享，
+                //这里就将egl和MediaCodec绑定，使得预览渲染上去的数据作为编码的输入
                 eglHelper!!.initEgl(it.mSurface!!, it.mEglContext)
             }
 
@@ -320,7 +322,7 @@ open class BaseMediaEncoder(val context: Context) {
     }
 
     /**
-     * 视频编码线程。MediaCodec用Surface接收OepnGl渲染线程传来的原始视频帧，进行编码，编码后将视频帧交给MediaMuxer进行封装
+     * 视频编码线程。MediaCodec用Surface接收OpenGl渲染线程传来的原始视频帧，进行编码，编码后将视频帧交给MediaMuxer进行封装
      * 可以看作EglMediaThread的消费者
      */
     class VideoEncodeThread(private val mediaEncodeReference: WeakReference<BaseMediaEncoder>) : Thread() {
@@ -402,7 +404,7 @@ open class BaseMediaEncoder(val context: Context) {
                             mediaMuxer!!.writeSampleData(videoTrackIndex!!, outputBuffer, videoBufferInfo!!)
 
                             mediaEncodeReference.get()
-                                ?.onMediaInfoListener?.onMediaTime(videoBufferInfo!!.presentationTimeUs / 1000000)
+                                    ?.onMediaInfoListener?.onMediaTime(videoBufferInfo!!.presentationTimeUs / 1000000)
                         }
 
                         //将用完的OutputBuffer会还给videoEncoder
@@ -491,8 +493,8 @@ open class BaseMediaEncoder(val context: Context) {
                             audioBufferInfo!!.presentationTimeUs = audioBufferInfo!!.presentationTimeUs - pts
 
                             Log.d(
-                                "audioBufferInfo",
-                                "audioBufferInfo!!.presentationTimeUs:${audioBufferInfo!!.presentationTimeUs}"
+                                    "audioBufferInfo",
+                                    "audioBufferInfo!!.presentationTimeUs:${audioBufferInfo!!.presentationTimeUs}"
                             )
 
                             //将输出Buffer（即已经编码好的音频帧数据）写入复用器（这里需要确保轨道index正确）
