@@ -9,7 +9,11 @@ import android.view.SurfaceView
 import java.lang.ref.WeakReference
 import javax.microedition.khronos.egl.EGLContext
 
-
+/**
+* @date 2020/3/8
+* @user yanyinan
+* @description 自定义的GlSurfaceView，主要用于将OpenGL数据同时渲染到多个纹理上
+**/
 open class CustomGlSurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     protected val TAG = this.javaClass.simpleName

@@ -7,7 +7,7 @@ import android.opengl.Matrix.orthoM
 import android.opengl.Matrix.rotateM
 import com.haha.record.egl.CustomGlSurfaceView
 import com.haha.record.R
-import com.haha.record.opengl.WlShaderUtil
+import com.haha.record.opengl.ShaderUtil
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -44,7 +44,7 @@ class MediaEncodeRender(val context: Context, private val textureId: Int) : Cust
 
     init {
 
-        textImage = WlShaderUtil.crateTextImage("谈笑间樯橹灰飞烟灭", 50, "#ffeedd", "#00000000", 0)
+        textImage = ShaderUtil.crateTextImage("谈笑间樯橹灰飞烟灭", 50, "#ffeedd", "#00000000", 0)
         //水印宽高比
         val textImageRatio = 1.0f * textImage!!.width / textImage!!.height
         //设置水印实际高度为屏幕高的0.1f
@@ -84,11 +84,11 @@ class MediaEncodeRender(val context: Context, private val textureId: Int) : Cust
             GLES20.glEnable(GLES20.GL_BLEND)
             GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
-            vertexSource = WlShaderUtil.readRawTExt(context, R.raw.vertex_shader_screen)
+            vertexSource = ShaderUtil.readRawTExt(context, R.raw.vertex_shader_screen)
             //这里绑定的是显示到屏幕的Shader
-            val fragmentSource = WlShaderUtil.readRawTExt(context, R.raw.fragment_shader_screen)
+            val fragmentSource = ShaderUtil.readRawTExt(context, R.raw.fragment_shader_screen)
 
-            program = WlShaderUtil.createProgram(vertexSource, fragmentSource)
+            program = ShaderUtil.createProgram(vertexSource, fragmentSource)
 
             vPosition = GLES20.glGetAttribLocation(program, "av_Position")
             fPosition = GLES20.glGetAttribLocation(program, "af_Position")
@@ -110,7 +110,7 @@ class MediaEncodeRender(val context: Context, private val textureId: Int) : Cust
             GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.size * 4, fragmentData.size * 4, fragmentBuffer)
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0)
 
-            textImageTextureId = WlShaderUtil.loadBitmapTexture(textImage)
+            textImageTextureId = ShaderUtil.loadBitmapTexture(textImage)
 
         } catch (e: IOException) {
             e.printStackTrace()

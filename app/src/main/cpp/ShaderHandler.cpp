@@ -196,6 +196,10 @@ void ShaderHandler::loadTexture(unsigned int index, int width, int height, unsig
     unsigned int format = GL_LUMINANCE;
     if (isAlpha) {
         //带透明通道，按照亮度和alpha值存储纹理单元
+        //Each element is a single luminance value. The GL converts it to floating point,
+        // then assembles it into an RGBA element by replicating the luminance value three times
+        // for red, green, and blue and attaching 1 for alpha. Each component is then clamped
+        // to the range [0,1].
         format = GL_LUMINANCE_ALPHA;
     }
 
@@ -216,6 +220,14 @@ void ShaderHandler::loadTexture(unsigned int index, int width, int height, unsig
         // 加载纹理到 OpenGL，读入 buffer 定义的位图数据，并把它复制到当前绑定的纹理对象
         // 当前绑定的纹理对象就会被附加上纹理图像。
         //width,height表示每几个像素公用一个yuv元素？比如width / 2表示横向每两个像素使用一个元素？
+
+        //Color components are converted to floating point based on the type. When type is
+        // GL_UNSIGNED_BYTE, each component is divided by 2 8 - 1 . When type is
+        // GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_4_4_4_4, or GL_UNSIGNED_SHORT_5_5_5_1,
+        // each component is divided by 2 N - 1 , where N is the number of bits in the bitfield.
+
+        //data may be a null pointer. In this case, texture memory is allocated to accommodate
+        // a texture of width width and height height.
         glTexImage2D(GL_TEXTURE_2D,
                      0,//细节基本 默认0
                      format,//gpu内部格式 亮度，灰度图（这里就是只取一个亮度的颜色通道的意思）

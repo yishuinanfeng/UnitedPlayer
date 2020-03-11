@@ -187,6 +187,7 @@ open class BaseMediaEncoder(val context: Context) {
         audioBufferInfo = MediaCodec.BufferInfo()
         audioFormat = MediaFormat.createAudioFormat(mimeType, sampleRate, channelCount)
         audioFormat!!.setInteger(MediaFormat.KEY_BIT_RATE, 96000)
+        //profile
         audioFormat!!.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
         //缓冲最大大小
         audioFormat!!.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096)
@@ -331,6 +332,7 @@ open class BaseMediaEncoder(val context: Context) {
 
         private var videoEncoder: MediaCodec? = mediaEncodeReference.get()?.videoEncoder
         private var videoFormat: MediaFormat? = mediaEncodeReference.get()?.videoFormat
+        //存放MediaCodec编码完成后的Buffer信息数据
         private var videoBufferInfo: MediaCodec.BufferInfo? = mediaEncodeReference.get()?.videoBufferInfo
         private var mediaMuxer: MediaMuxer? = mediaEncodeReference.get()?.mediaMuxer
         @Volatile
@@ -351,7 +353,7 @@ open class BaseMediaEncoder(val context: Context) {
                     //进入Released状态
                     videoEncoder?.release()
                     videoEncoder = null
-                    //MediaMuxer只有stop的时候才会将头信息写入
+                    //MediaMuxer只有stop的时候才会将头信息(ADTS)写入
                     //保证音视频编码都退出了才停止mediaMuxer
                     mediaEncodeReference.get()?.videoExit = true
                     mediaEncodeReference.get()?.let {
@@ -371,7 +373,7 @@ open class BaseMediaEncoder(val context: Context) {
                 var outputBufferIndex = videoEncoder!!.dequeueOutputBuffer(videoBufferInfo!!, 0)
                 Log.d(TAG, "videoEncoder outputBufferIndex：$outputBufferIndex")
                 if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    //format改变 意味着要开始将得到的数据编码成mp4了，启动mMuxer
+                    //format改变 意味着要开始将得到的数据编码成AAC了，启动mMuxer
                     //生成一个视频轨道，提供给之后复用封装使用。既然是封装，就需要之si指定封装格式
                     Log.d(TAG, "addTrack videoEncoder!!.outputFormat:${videoEncoder!!.outputFormat}")
                     videoTrackIndex = mediaMuxer!!.addTrack(videoEncoder!!.outputFormat)
@@ -385,7 +387,7 @@ open class BaseMediaEncoder(val context: Context) {
 
                 } else {
                     //因为有时候一个buffer不够存放一帧数据，所以这里循环取连续的buffer
-                    //outputBufferIndex为Buffer的索引，大于0说明是编码成功的Buffer？
+                    //outputBufferIndex为Buffer的索引，大于0说明是编码成功的Buffer
                     while (outputBufferIndex >= 0) {
                         if (mediaEncodeReference.get()!!.encodeStart) {
                             val outputBuffer = videoEncoder!!.outputBuffers[outputBufferIndex]

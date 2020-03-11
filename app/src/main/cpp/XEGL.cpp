@@ -48,7 +48,7 @@ public:
         display = EGL_NO_DISPLAY;
         eglSurface = EGL_NO_SURFACE;
         eglContext = EGL_NO_CONTEXT;
-     //   mutex.unlock();
+
     }
 
     virtual bool Init(void *win) {

@@ -62,7 +62,8 @@ public class FboRender {
 
     public FboRender(Context context) {
         this.context = context;
-        textImage = WlShaderUtil.crateTextImage("谈笑间樯橹灰飞烟灭", 50, "#ffeedd", "#00000000", 0);
+        //根据传入的文字和颜色以及尺寸生成一张对应的带文字的Bitmap
+        textImage = ShaderUtil.crateTextImage("谈笑间樯橹灰飞烟灭", 50, "#ffeedd", "#00000000", 0);
         //水印宽高比
         float textImageRatio = 1.0f * textImage.getWidth() / textImage.getHeight();
         //设置水印实际高度为屏幕高的0.1f
@@ -101,11 +102,11 @@ public class FboRender {
             //支持透明绘制
             GLES20.glEnable(GLES20.GL_BLEND);
             GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-            vertexSource = WlShaderUtil.readRawTExt(context, R.raw.vertex_shader_screen);
+            vertexSource = ShaderUtil.readRawTExt(context, R.raw.vertex_shader_screen);
             //这里绑定的是显示到屏幕的Shader
-            String fragmentSource = WlShaderUtil.readRawTExt(context, R.raw.fragment_shader_screen);
+            String fragmentSource = ShaderUtil.readRawTExt(context, R.raw.fragment_shader_screen);
 
-            program = WlShaderUtil.createProgram(vertexSource, fragmentSource);
+            program = ShaderUtil.createProgram(vertexSource, fragmentSource);
 
             vPosition = GLES20.glGetAttribLocation(program, "av_Position");
             fPosition = GLES20.glGetAttribLocation(program, "af_Position");
@@ -122,7 +123,7 @@ public class FboRender {
             GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, fragmentData.length * 4, fragmentBuffer);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-            textImageTextureId = WlShaderUtil.loadBitmapTexture(textImage);
+            textImageTextureId = ShaderUtil.loadBitmapTexture(textImage);
         } catch (IOException e) {
             e.printStackTrace();
         }

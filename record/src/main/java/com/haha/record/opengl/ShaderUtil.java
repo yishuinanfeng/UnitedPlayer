@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 
-public class WlShaderUtil {
+public class ShaderUtil {
 
     public static String readRawTExt(Context context, int rawId) throws IOException {
         InputStream inputStream = context.getResources().openRawResource(rawId);
@@ -37,7 +37,7 @@ public class WlShaderUtil {
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compile, 0);
             if (compile[0] != GLES20.GL_TRUE) {
                 String info = GLES20.glGetShaderInfoLog(shader);
-                Log.d("WlShaderUtil", "shader compile error:" + info);
+                Log.d("ShaderUtil", "shader compile error:" + info);
                 GLES20.glDeleteShader(shader);
                 shader = 0;
             }
@@ -66,12 +66,12 @@ public class WlShaderUtil {
             int[] linkStatus = new int[1];
             GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
             if (linkStatus[0] != GLES20.GL_TRUE) {
-                Log.d("WlShaderUtil", "link shader error");
+                Log.d("ShaderUtil", "link shader error");
                 GLES20.glDeleteProgram(program);
                 program = 0;
             }
         }
-        Log.d("WlShaderUtil", "link shader success");
+        Log.d("ShaderUtil", "link shader success");
         return program;
     }
 

@@ -56,7 +56,7 @@ public class RecordActivity extends AppCompatActivity {
                 if (!file.exists()) {
                     file.createNewFile();
                 }
-
+                //获得OpenGL的FBO渲染的纹理id，通过共享纹理id的方式将图像数据写入MediaCodec
                 mediaEncodec = new MediaEncoder(RecordActivity.this, cameraView.getTextureId());
                 mediaEncodec.initEncoder(cameraView.getEglContext(), videoPath
 
@@ -128,5 +128,13 @@ public class RecordActivity extends AppCompatActivity {
             stop();
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (cameraView != null) {
+            cameraView.onDestroy();
+        }
     }
 }
