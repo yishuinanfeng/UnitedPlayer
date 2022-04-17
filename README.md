@@ -6,18 +6,21 @@
 
 **相关博客系列目录：**  
 
+[音视频开发系统学习的浪漫马车之总目录](https://juejin.cn/post/7033711226827833351)
+
+
 **C内存与指针：**  
 [漫谈C语言内存管理](https://juejin.cn/post/7033711811006464030)  
 [漫谈C语言指针（一）](https://juejin.cn/post/7033711907660005413)  
 [漫谈C语言指针（二）](https://juejin.cn/post/7033713132178669582)  
 [漫谈C语言指针（三）](https://juejin.cn/post/7033713772011192333)  
 
-**C++语法重点难点：**
+**C++语法重点难点：**  
 [初尝C++的世界](https://juejin.cn/post/7033714154880008222)  
 [进一步走进C++面向对象的世界](https://juejin.cn/post/7033715596348882974)  
 [感受C++一些令人眼前一亮的语法](https://juejin.cn/post/7035447100464693256)  
 
-**C/C++进阶：**
+**C/C++进阶：**  
 [C/C++编译流程](https://juejin.cn/post/7043778638802518052)  
 [一篇文章入门C/C++自动构建利器之Makefile](https://juejin.cn/post/7046401218331017224)  
 [升级构建工具，从Makefile到CMake](https://juejin.cn/post/7058217745321558024)  
@@ -26,10 +29,10 @@
 
 
 **视频理论基础：**\
-[视频基础知识扫盲](https://blog.csdn.net/sinat_23092639/article/details/123194719?spm=1001.2014.3001.5501)\
-[音视频开发基础知识之YUV颜色编码](https://blog.csdn.net/sinat_23092639/article/details/116399776)\
-[解析视频编码原理——从孙艺珍的电影说起（一）](https://blog.csdn.net/sinat_23092639/article/details/123441812)\
-[解析视频编码原理——从孙艺珍的电影说起（二）](https://blog.csdn.net/sinat_23092639/article/details/123952921)  
+[视频基础知识扫盲](<https://juejin.cn/post/7082945332945879071>)\
+[音视频开发基础知识之YUV颜色编码](<https://juejin.cn/post/7083427060240089096>)\
+[解析视频编码原理——从孙艺珍的电影说起（一）](<https://juejin.cn/post/7083679329183334407>)\
+[解析视频编码原理——从孙艺珍的电影说起（二）](<https://juejin.cn/post/7084062884983996430>)  
 
 
 ## 基本技术实现点：
