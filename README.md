@@ -33,6 +33,17 @@
 [音视频开发基础知识之YUV颜色编码](<https://juejin.cn/post/7083427060240089096>)\
 [解析视频编码原理——从孙艺珍的电影说起（一）](<https://juejin.cn/post/7083679329183334407>)\
 [解析视频编码原理——从孙艺珍的电影说起（二）](<https://juejin.cn/post/7084062884983996430>)  
+[H264码流结构一探究竟](https://juejin.cn/post/7092773284000989191/ "https://juejin.cn/post/7092773284000989191/")
+
+**Android平台MediaCodec系列：**\
+[Android硬编解码利器MediaCodec解析——从猪肉餐馆的故事讲起（一）](https://juejin.cn/post/7110805190512967717/ "https://juejin.cn/post/7110805190512967717/")\
+[Android硬编解码工具MediaCodec解析——从猪肉餐馆的故事讲起（二）](https://juejin.cn/post/7111340889691127815/ "https://juejin.cn/post/7111340889691127815/")\
+[Android硬编解码工具MediaCodec解析——从猪肉餐馆的故事讲起（三）](https://juejin.cn/post/7113767096512675870 "https://juejin.cn/post/7113767096512675870")
+
+**轻松入门OpenGL系列**\
+[轻松入门OpenGL ES——图形渲染管线的那些事](https://juejin.cn/user/2541726614684216/posts "https://juejin.cn/user/2541726614684216/posts")\
+[轻松入门OpenGL ES——再谈OpenGL工作机制](https://juejin.cn/post/7121525553491869703 "https://juejin.cn/post/7121525553491869703")  
+[轻松入门OpenGL ES——这或许是你遇过最难画的三角形（一）](https://juejin.cn/post/7125449091563126792)
 
 
 ## 基本技术实现点：
